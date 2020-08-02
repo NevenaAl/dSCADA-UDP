@@ -1,0 +1,7 @@
+NO_CARD   5
+
+DO_REG  DO   41  1
+DI_REG  DI   81  1
+IN_REG  AI   32  1
+HR_INT  AO    4  1
+HR_LONG CNT   8  100

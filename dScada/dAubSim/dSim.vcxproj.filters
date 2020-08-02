@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{c98eca24-3838-4ee4-9b7d-191c87b46d96}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{81e2448b-8df8-4fdb-a2ad-ff544c3edf83}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Processing">
+      <UniqueIdentifier>{7f041063-18e8-4849-bc75-fc667b7451a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RTDataBase">
+      <UniqueIdentifier>{71d11d1e-343c-4b42-b106-2b831f45422e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dClient protocol">
+      <UniqueIdentifier>{ffc8e262-d8b2-4962-9920-1e7e531ea29a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{8c90db4b-d627-4142-b517-98bb1b67c3b7}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Simulator">
+      <UniqueIdentifier>{cfbaac04-e79b-4dbb-b5f7-6718ccfe8eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ApplicationSpecific">
+      <UniqueIdentifier>{33b535f9-83cc-4be5-97aa-a340bca52330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HashFun">
+      <UniqueIdentifier>{aa6a1779-bc78-426e-8c3e-9f952ecc5dbe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AUBTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoAUB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Loger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\conversion.cpp">
+      <Filter>Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\processing.cpp">
+      <Filter>Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\Globals.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\Ioascii.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeFun.cpp">
+      <Filter>dClient protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoSimDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator\Simulator.cpp">
+      <Filter>Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator\SimLib.cpp">
+      <Filter>Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator\SimPlant.cpp">
+      <Filter>Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator\SimRandom.cpp">
+      <Filter>Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\pvidstr.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadConfigFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationSpecific\ApplicationSpecific.cpp">
+      <Filter>ApplicationSpecific</Filter>
+    </ClCompile>
+    <ClCompile Include="dSim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HashFun\HashFun.cpp">
+      <Filter>HashFun</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DemoAUB.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AUBTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoAUB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoAUBDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\conversion.h">
+      <Filter>Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\processing.h">
+      <Filter>Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Commext.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Common.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Ioascii.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeFun.h">
+      <Filter>dClient protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulator\Simulator.h">
+      <Filter>Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\pvidstr.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSpecific\ApplicationSpecific.h">
+      <Filter>ApplicationSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSpecific\Catalogs.h">
+      <Filter>ApplicationSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="dSim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HashFun\HashFun.h">
+      <Filter>HashFun</Filter>
+    </ClInclude>
+    <ClInclude Include="HashFun\uthash.h">
+      <Filter>HashFun</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\exec\AubCfg.txt" />
+    <None Include="..\exec\RTU-1.TXT" />
+    <None Include="res\DemoAUB.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\DemoAUB.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\dSim.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

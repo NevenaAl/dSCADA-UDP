@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{c98eca24-3838-4ee4-9b7d-191c87b46d96}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{81e2448b-8df8-4fdb-a2ad-ff544c3edf83}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Processing">
+      <UniqueIdentifier>{7f041063-18e8-4849-bc75-fc667b7451a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modbus">
+      <UniqueIdentifier>{3ced3e3c-6cbb-494e-b0f8-ac5723a586ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RTDataBase">
+      <UniqueIdentifier>{71d11d1e-343c-4b42-b106-2b831f45422e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComAutomata">
+      <UniqueIdentifier>{8ab2470c-755a-41f3-b978-3b6f71647b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComPorts">
+      <UniqueIdentifier>{a3490592-ff1f-4ff6-919b-06b2b6803725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{8c90db4b-d627-4142-b517-98bb1b67c3b7}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="dScada protocols">
+      <UniqueIdentifier>{ffc8e262-d8b2-4962-9920-1e7e531ea29a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ApplicationSpecific">
+      <UniqueIdentifier>{018540b7-b76f-412f-a934-24e7784db4cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HashFun">
+      <UniqueIdentifier>{ce135309-38ee-4201-a52d-e9e25292df1f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AUBTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoAUB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoAUBDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Loger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\Globals.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\Ioascii.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeFun.cpp">
+      <Filter>dScada protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="ComPort.cpp">
+      <Filter>ComPorts</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpPort.cpp">
+      <Filter>ComPorts</Filter>
+    </ClCompile>
+    <ClCompile Include="UartPort.cpp">
+      <Filter>ComPorts</Filter>
+    </ClCompile>
+    <ClCompile Include="ComFun.cpp">
+      <Filter>ComAutomata</Filter>
+    </ClCompile>
+    <ClCompile Include="Modbus\modbus.cpp">
+      <Filter>Modbus</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTDataBase\pvidstr.cpp">
+      <Filter>RTDataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadConfigFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpPort.cpp">
+      <Filter>ComPorts</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationSpecific\ApplicationSpecific.cpp">
+      <Filter>ApplicationSpecific</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\Conversion.cpp">
+      <Filter>Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing\Processing.cpp">
+      <Filter>Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="dAUB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HashFun\HashFun.cpp">
+      <Filter>HashFun</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DemoAUB.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AUBTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoAUB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoAUBDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Modbus\Modbus.h">
+      <Filter>Modbus</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Commext.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Common.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\Ioascii.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeFun.h">
+      <Filter>dScada protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComPort.h">
+      <Filter>ComPorts</Filter>
+    </ClInclude>
+    <ClInclude Include="RTDataBase\pvidstr.h">
+      <Filter>RTDataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSpecific\Catalogs.h">
+      <Filter>ApplicationSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSpecific\ApplicationSpecific.h">
+      <Filter>ApplicationSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\Conversion.h">
+      <Filter>Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing\Processing.h">
+      <Filter>Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="dAUB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HashFun\HashFun.h">
+      <Filter>HashFun</Filter>
+    </ClInclude>
+    <ClInclude Include="HashFun\uthash.h">
+      <Filter>HashFun</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\DemoAUB.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\DemoAUB.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\exec\AubCfg.txt" />
+    <None Include="..\exec\RTU-1.TXT" />
+    <None Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\exec\dConfig.txt" />
+  </ItemGroup>
+</Project>

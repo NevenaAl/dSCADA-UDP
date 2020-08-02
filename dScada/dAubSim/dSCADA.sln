@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAUB", "DemoAUB.vcxproj", "{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dSim", "dSim.vcxproj", "{B489930B-2A08-4B01-B179-D53AD9C43225}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Template|Win32 = Template|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Debug|Win32.Build.0 = Debug|Win32
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Release|Win32.ActiveCfg = Release|Win32
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Release|Win32.Build.0 = Release|Win32
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Template|Win32.ActiveCfg = Template|Win32
+		{05B8EE14-A377-417C-88C4-F7A5ADE4AED4}.Template|Win32.Build.0 = Template|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Debug|Win32.Build.0 = Debug|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Release|Win32.ActiveCfg = Release|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Release|Win32.Build.0 = Release|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Template|Win32.ActiveCfg = Template|Win32
+		{B489930B-2A08-4B01-B179-D53AD9C43225}.Template|Win32.Build.0 = Template|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

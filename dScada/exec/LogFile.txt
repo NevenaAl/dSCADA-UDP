@@ -1,0 +1,16 @@
+<06/16/20 10:22:00> Client ioctlsocket read problem! Error code: 10038
+<06/16/20 10:22:09> Bind socket problem! Error code: 10048
+<06/16/20 10:22:09> Abort comport.cpp|143 !
+<06/16/20 10:22:20> Abort comport.cpp|143 !
+<06/16/20 10:26:55> Client ioctlsocket read problem! Error code: 10038
+<06/16/20 10:32:36> Bind socket problem! Error code: 10048
+<06/16/20 10:33:10> Client ioctlsocket read problem! Error code: 10038
+<06/16/20 10:33:29> Client ioctlsocket read problem! Error code: 10038
+<06/16/20 10:33:43> Bind socket problem! Error code: 10048
+<06/16/20 10:34:08> Client ioctlsocket read problem! Error code: 10093
+<06/16/20 10:34:23> Client ioctlsocket read problem! Error code: 10093
+<07/25/20 19:59:32> Bind socket problem! Error code: 10048
+<07/25/20 20:03:24> Client ioctlsocket read problem! Error code: 10038
+<07/29/20 17:13:18> Bind socket problem! Error code: 10048
+<07/29/20 17:28:55> Client ioctlsocket read problem! Error code: 10093
+<08/01/20 18:56:58> Client ioctlsocket read problem! Error code: 10038

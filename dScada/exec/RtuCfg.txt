@@ -1,0 +1,10 @@
+STA 1
+TCP 4001
+MMAP 10000
+RSIM 0
+
+DO_REG   41   1  0  0      1     0  DO  @DigOut
+DI_REG   81   1  0  0      1     0  DI  @DigIn
+IN_REG   32   1  0  0   4095  2000  AI  @AnaIn
+HR_INT    4   1  0  0   4095  1200  AO  @AnaOut
+HR_LONG   8 100  0  0  72000     0  CNT @Counter

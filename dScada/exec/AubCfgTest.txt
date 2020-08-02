@@ -1,0 +1,1930 @@
+[SYSTEM]
+  SysName          SN sistem - DEMO2
+[STOP]
+
+[EGU]
+  Unit             V
+  Color            Tomato
+[STOP]
+
+[EGU]
+  Unit             kV
+  Color            Tomato
+[STOP]
+
+[EGU]
+  Unit             A
+  Color            Yellow
+[STOP]
+
+[EGU]
+  Unit             kA
+  Color            Yellow
+[STOP]
+
+[EGU]
+  Unit             MW
+  Color            LightGreen
+[STOP]
+
+[EGU]
+  Unit             MVAr
+  Color            LightGreen
+[STOP]
+
+[EGU]
+  Unit             MWh
+  Color            Cyan
+[STOP]
+
+[EGU]
+  Unit             MVArh
+  Color            LightCyan
+[STOP]
+
+[EGU]
+  Unit             Hz
+  Color            LightPink
+[STOP]
+
+[EGU]
+  Unit             oC
+  Color            White
+[STOP]
+
+[EGU]
+  Unit             mA
+  Color            White
+[STOP]
+
+[EGU]
+  Unit             -
+  Color            White
+[STOP]
+
+[STATE]
+  State            NEPOZNATO
+  Color            LightGray
+[STOP]
+
+[STATE]
+  State            NEMA_ULAZA
+  Color            LightGray
+[STOP]
+
+[STATE]
+  State            ZATVORENO
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            OTVORENO
+  Color            LightGreen
+[STOP]
+
+[STATE]
+  State            PROMENA
+  Color            Magenta
+[STOP]
+
+[STATE]
+  State            KVAR
+  Color            LightPink
+[STOP]
+
+[STATE]
+  State            NORMALNO
+  Color            LightGreen
+[STOP]
+
+[STATE]
+  State            ALARM
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            ISPAD
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            PRORADA
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            NAJAVA
+  Color            Yellow
+[STOP]
+
+[STATE]
+  State            ISKLJUCENO
+  Color            White
+[STOP]
+
+[STATE]
+  State            UKLJUCENO
+  Color            Yellow
+[STOP]
+
+[STATE]
+  State            POD_NAPONOM
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            BEZ_NAPONA
+  Color            White
+[STOP]
+
+[STATE]
+  State            ZABRANJENO
+  Color            Tomato
+[STOP]
+
+[STATE]
+  State            DOZVOLJENO
+  Color            LightGreen
+[STOP]
+
+[COMMAND]
+  Command          NEPOZNATO
+  Color            LightGray
+[STOP]
+
+[COMMAND]
+  Command          NEMA_IZLAZA
+  Color            LightGray
+[STOP]
+
+[COMMAND]
+  Command          ZABRANJENO
+  Color            LightPink
+[STOP]
+
+[COMMAND]
+  Command          ZATVORI
+  Color            Tomato
+[STOP]
+
+[COMMAND]
+  Command          OTVORI
+  Color            LightCyan
+[STOP]
+
+[COMMAND]
+  Command          MIRUJ
+  Color            White
+[STOP]
+
+[COMMAND]
+  Command          ISKLJUCI
+  Color            White
+[STOP]
+
+[COMMAND]
+  Command          UKLJUCI
+  Color            Yellow
+[STOP]
+
+[DIGDEF]
+  Type             Prekidac
+  NoDigIn          2
+  NoDigOut         2
+  StsList
+    State          PROMENA             < 00 >
+    State          ZATVORENO           < 01 >
+    State          OTVORENO            < 10 >
+    State          KVAR                < 11 >
+  CmdList
+    Command        MIRUJ               < 00 >
+    Command        ZATVORI             < 01 >
+    Command        OTVORI              < 10 >
+    Command        ZABRANJENO          < 11 >
+[STOP]
+
+[DIGDEF]
+  Type             Rastavljac
+  NoDigIn          2
+  NoDigOut         2
+  StsList
+    State          PROMENA             < 00 >
+    State          ZATVORENO           < 01 >
+    State          OTVORENO            < 10 >
+    State          KVAR                < 11 >
+  CmdList
+    Command        MIRUJ               < 00 >
+    Command        ZATVORI             < 01 >
+    Command        OTVORI              < 10 >
+    Command        ZABRANJENO          < 11 >
+[STOP]
+
+[DIGDEF]
+  Type             Uzemljivac
+  NoDigIn          2
+  NoDigOut         2
+  StsList
+    State          PROMENA             < 00 >
+    State          ZATVORENO           < 01 >
+    State          OTVORENO            < 10 >
+    State          KVAR                < 11 >
+  CmdList
+    Command        MIRUJ               < 00 >
+    Command        ZATVORI             < 01 >
+    Command        OTVORI              < 10 >
+    Command        ZABRANJENO          < 11 >
+[STOP]
+
+[DIGDEF]
+  Type             Kontaktor
+  NoDigIn          1
+  NoDigOut         1
+  StsList
+    State          ISKLJUCENO          < 0 >
+    State          UKLJUCENO           < 1 >
+  CmdList
+    Command        ISKLJUCI            < 0 >
+    Command        UKLJUCI             < 1 >
+[STOP]
+
+[DIGDEF]
+  Type             DigAlarm
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          NORMALNO            < 0 >
+    State          ALARM               < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             AutoProrada
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          NORMALNO            < 0 >
+    State          PRORADA             < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             AutoNajava
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          NORMALNO            < 0 >
+    State          NAJAVA              < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             Automat
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          NORMALNO            < 0 >
+    State          ISPAD               < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             IndNapona
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          BEZ_NAPONA          < 0 >
+    State          POD_NAPONOM         < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             IndDKontrole
+  NoDigIn          1
+  NoDigOut         0
+  StsList
+    State          ZABRANJENO          < 0 >
+    State          DOZVOLJENO          < 1 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[DIGDEF]
+  Type             bata
+  NoDigIn          4
+  NoDigOut         0
+  StsList
+    State          NEPOZNATO           < 0000 >
+    State          ISKLJUCENO          < 0001 >
+    State          PRORADA             < 0010 >
+    State          ALARM               < 0011 >
+    State          NORMALNO            < 0100 >
+    State          ISKLJUCENO          < 0101 >
+    State          OTVORENO            < 0110 >
+    State          KVAR                < 0111 >
+    State          ALARM               < 1000 >
+    State          NAJAVA              < 1001 >
+    State          ZATVORENO           < 1010 >
+    State          OTVORENO            < 1011 >
+    State          PROMENA             < 1100 >
+    State          KVAR                < 1101 >
+    State          ISPAD               < 1110 >
+    State          NORMALNO            < 1111 >
+  CmdList
+    Command        NEMA_IZLAZA         < 0 >
+[STOP]
+
+[OBJDEF]
+  Type             Sabirnica
+  Class            DigObj
+  Category         Real
+  NoElem           5
+  ElemList
+    Element        PK : Digital                  < 0 >
+    Element        RS1 : Digital                 < 1 >
+    Element        RS2 : Digital                 < 2 >
+    Element        RZ : Digital                  < 3 >
+    Element        VPN : Digital                 < 4 >
+  NoParam          2
+  ParamList
+    Parameter      TipASDU             < 0 >
+    Parameter      AdrIOBJ             < 1 >
+[STOP]
+
+[OBJDEF]
+  Type             Spojnica
+  Class            DigObj
+  Category         Real
+  NoElem           4
+  ElemList
+    Element        Sabirnica1 : Object           < 0 >
+    Element        Sabirnica2 : Object           < 1 >
+    Element        Rastavljac1 : Digital         < 2 >
+    Element        Rastavljac2 : Digital         < 3 >
+  NoParam          0
+[STOP]
+
+[OBJDEF]
+  Type             Suma
+  Class            AnaObj
+  Category         Virtual
+  NoElem           2
+  ElemList
+    Element        Sabirak1 : AnyType            < 0 >
+    Element        Sabirak2 : AnyType            < 1 >
+  NoParam          0
+[STOP]
+
+[OBJDEF]
+  Type             Izvod
+  Class            DigObj
+  Category         Real
+  NoElem           11
+  ElemList
+    Element        RS : Digital                  < 0 >
+    Element        PK : Digital                  < 1 >
+    Element        RI : Digital                  < 2 >
+    Element        RPS : Digital                 < 3 >
+    Element        RZ : Digital                  < 4 >
+    Element        JS : AnaIn                    < 5 >
+    Element        US : AnaIn                    < 6 >
+    Element        ZKS : Digital                 < 7 >
+    Element        ZZS : Digital                 < 8 >
+    Element        ZTP : Digital                 < 9 >
+    Element        VPN : Digital                 < 10 >
+  NoParam          0
+[STOP]
+
+[OBJDEF]
+  Type             Trafo
+  Class            DigObj
+  Category         Real
+  NoElem           17
+  ElemList
+    Element        JR : AnaIn                    < 0 >
+    Element        JS : AnaIn                    < 1 >
+    Element        JT : AnaIn                    < 2 >
+    Element        UR : AnaIn                    < 3 >
+    Element        US : AnaIn                    < 4 >
+    Element        UT : AnaIn                    < 5 >
+    Element        FR : AnaIn                    < 6 >
+    Element        COSF : AnaIn                  < 7 >
+    Element        PA : AnaIn                    < 8 >
+    Element        PR : AnaIn                    < 9 >
+    Element        TEMP : AnaIn                  < 10 >
+    Element        EA : Counter                  < 11 >
+    Element        ER : Counter                  < 12 >
+    Element        OS : Digital                  < 13 >
+    Element        BN : Digital                  < 14 >
+    Element        BP : Digital                  < 15 >
+    Element        ZTP : Digital                 < 16 >
+  NoParam          0
+[STOP]
+
+[OBJDEF]
+  Type             AnObj
+  Class            AnaObj
+  Category         Virtual
+  NoElem           1
+  ElemList
+    Element        e0 : AnyType                  < 0 >
+  NoParam          1
+  ParamList
+    Parameter      p0                  < 0 >
+[STOP]
+
+[OBJDEF]
+  Type             Obj30
+  Class            DigObj
+  Category         Virtual
+  NoElem           30
+  ElemList
+    Element        e00 : AnyType                 < 0 >
+    Element        e01 : AnyType                 < 1 >
+    Element        e02 : AnyType                 < 2 >
+    Element        e03 : AnyType                 < 3 >
+    Element        e04 : AnyType                 < 4 >
+    Element        e05 : AnyType                 < 5 >
+    Element        e06 : AnyType                 < 6 >
+    Element        e07 : AnyType                 < 7 >
+    Element        e08 : AnyType                 < 8 >
+    Element        e09 : AnyType                 < 9 >
+    Element        e10 : AnyType                 < 10 >
+    Element        e11 : AnyType                 < 11 >
+    Element        e12 : AnyType                 < 12 >
+    Element        e13 : AnyType                 < 13 >
+    Element        e14 : AnyType                 < 14 >
+    Element        e15 : AnyType                 < 15 >
+    Element        e16 : AnyType                 < 16 >
+    Element        e17 : AnyType                 < 17 >
+    Element        e18 : AnyType                 < 18 >
+    Element        e19 : AnyType                 < 19 >
+    Element        e20 : AnyType                 < 20 >
+    Element        e21 : AnyType                 < 21 >
+    Element        e22 : AnyType                 < 22 >
+    Element        e23 : AnyType                 < 23 >
+    Element        e24 : AnyType                 < 24 >
+    Element        e25 : AnyType                 < 25 >
+    Element        e26 : AnyType                 < 26 >
+    Element        e27 : AnyType                 < 27 >
+    Element        e28 : AnyType                 < 28 >
+    Element        e29 : AnyType                 < 29 >
+  NoParam          30
+  ParamList
+    Parameter      p00                 < 0 >
+    Parameter      p01                 < 1 >
+    Parameter      p02                 < 2 >
+    Parameter      p03                 < 3 >
+    Parameter      p04                 < 4 >
+    Parameter      p05                 < 5 >
+    Parameter      p06                 < 6 >
+    Parameter      p07                 < 7 >
+    Parameter      p08                 < 8 >
+    Parameter      p09                 < 9 >
+    Parameter      p10                 < 10 >
+    Parameter      p11                 < 11 >
+    Parameter      p12                 < 12 >
+    Parameter      p13                 < 13 >
+    Parameter      p14                 < 14 >
+    Parameter      p15                 < 15 >
+    Parameter      p16                 < 16 >
+    Parameter      p17                 < 17 >
+    Parameter      p18                 < 18 >
+    Parameter      p19                 < 19 >
+    Parameter      p20                 < 20 >
+    Parameter      p21                 < 21 >
+    Parameter      p22                 < 22 >
+    Parameter      p23                 < 23 >
+    Parameter      p24                 < 24 >
+    Parameter      p25                 < 25 >
+    Parameter      p26                 < 26 >
+    Parameter      p27                 < 27 >
+    Parameter      p28                 < 28 >
+    Parameter      p29                 < 29 >
+[STOP]
+
+[CHANNEL]   < DAC-1 >
+  Protocol         MODBUS
+  TimeOut          2
+  Port             TCP1
+  ipSide           Client
+  Name             DAC-1
+  Info             Akvizicioni kanal 1
+[STOP]
+
+[RTU]   < RTU-1 >
+  Virtual          OFF
+  Channel          DAC-1
+  CommAddr         1
+  Period           5
+  NoAin            32
+  NoAout           4
+  NoDin            81
+  NoDout           41
+  NoCnt            8
+  Name             RTU-1
+  Info             Kontroler RTU-1
+  HostName         localhost
+  HostPort         4001
+[STOP]
+
+[ANAIN]   < RTU-1:JS-I21 >
+  EGUnit           A
+  EguBandLow       0.0
+  EguBandHigh      600.0
+  AlarmLow         20.0
+  AlarmHigh        500.0
+  WarnLow          40.0
+  WarnHigh         250.0
+  DeadBand         6.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           0
+  RTU              RTU-1
+  Name             JS-I21
+  Info             Struja u fazi S I21
+[STOP]
+
+[ANAIN]   < RTU-1:US-I21 >
+  EGUnit           kV
+  EguBandLow       0.0
+  EguBandHigh      15.0
+  AlarmLow         11.0
+  AlarmHigh        12.0
+  WarnLow          11.0
+  WarnHigh         12.0
+  DeadBand         0.150000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           1
+  RTU              RTU-1
+  Name             US-I21
+  Info             Napon u fazi S I21
+[STOP]
+
+[ANAIN]   < RTU-1:JR-T1 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           2
+  RTU              RTU-1
+  Name             JR-T1
+  Info             Struja u fazi R T1
+[STOP]
+
+[ANAIN]   < RTU-1:JS-T1 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           3
+  RTU              RTU-1
+  Name             JS-T1
+  Info             Struja u fazi S T1
+[STOP]
+
+[ANAIN]   < RTU-1:JT-T1 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           4
+  RTU              RTU-1
+  Name             JT-T1
+  Info             Struja u fazi T T1
+[STOP]
+
+[ANAIN]   < RTU-1:UR-T1 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           5
+  RTU              RTU-1
+  Name             UR-T1
+  Info             Napon u fazi R T1
+[STOP]
+
+[ANAIN]   < RTU-1:US-T1 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           6
+  RTU              RTU-1
+  Name             US-T1
+  Info             Napon u fazi S T1
+[STOP]
+
+[ANAIN]   < RTU-1:UT-T1 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           7
+  RTU              RTU-1
+  Name             UT-T1
+  Info             Napon u fazi T T1
+[STOP]
+
+[ANAIN]   < RTU-1:FR-T1 >
+  EGUnit           Hz
+  EguBandLow       0.0
+  EguBandHigh      60.0
+  AlarmLow         45.0
+  AlarmHigh        55.0
+  WarnLow          45.0
+  WarnHigh         55.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           8
+  RTU              RTU-1
+  Name             FR-T1
+  Info             Frekvencija T1
+[STOP]
+
+[ANAIN]   < RTU-1:PA-T1 >
+  EGUnit           MW
+  EguBandLow       0.0
+  EguBandHigh      5.0
+  AlarmLow         1.0
+  AlarmHigh        4.80
+  WarnLow          2.0
+  WarnHigh         4.0
+  DeadBand         0.010000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           9
+  RTU              RTU-1
+  Name             PA-T1
+  Info             Aktivna snaga T1
+[STOP]
+
+[ANAIN]   < RTU-1:PR-T1 >
+  EGUnit           MVAr
+  EguBandLow       0.0
+  EguBandHigh      5.0
+  AlarmLow         1.0
+  AlarmHigh        4.80
+  WarnLow          2.0
+  WarnHigh         4.0
+  DeadBand         0.010000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           10
+  RTU              RTU-1
+  Name             PR-T1
+  Info             Reaktivna snaga T1
+[STOP]
+
+[ANAIN]   < RTU-1:JS-I22 >
+  EGUnit           A
+  EguBandLow       0.0
+  EguBandHigh      600.0
+  AlarmLow         20.0
+  AlarmHigh        500.0
+  WarnLow          40.0
+  WarnHigh         250.0
+  DeadBand         6.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           11
+  RTU              RTU-1
+  Name             JS-I22
+  Info             Struja u fazi S I22
+[STOP]
+
+[ANAIN]   < RTU-1:US-I22 >
+  EGUnit           kV
+  EguBandLow       0.0
+  EguBandHigh      15.0
+  AlarmLow         11.0
+  AlarmHigh        12.0
+  WarnLow          11.0
+  WarnHigh         12.0
+  DeadBand         0.150000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           12
+  RTU              RTU-1
+  Name             US-I22
+  Info             Napon u fazi S I22
+[STOP]
+
+[ANAIN]   < RTU-1:JR-T2 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           13
+  RTU              RTU-1
+  Name             JR-T2
+  Info             Struja u fazi R T2
+[STOP]
+
+[ANAIN]   < RTU-1:JS-T2 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           14
+  RTU              RTU-1
+  Name             JS-T2
+  Info             Struja u fazi S T2
+[STOP]
+
+[ANAIN]   < RTU-1:JT-T2 >
+  EGUnit           kA
+  EguBandLow       0.0
+  EguBandHigh      10.0
+  AlarmLow         1.0
+  AlarmHigh        9.0
+  WarnLow          2.0
+  WarnHigh         8.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           15
+  RTU              RTU-1
+  Name             JT-T2
+  Info             Struja u fazi T T2
+[STOP]
+
+[ANAIN]   < RTU-1:UR-T2 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           16
+  RTU              RTU-1
+  Name             UR-T2
+  Info             Napon u fazi R T2
+[STOP]
+
+[ANAIN]   < RTU-1:US-T2 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           17
+  RTU              RTU-1
+  Name             US-T2
+  Info             Napon u fazi S T2
+[STOP]
+
+[ANAIN]   < RTU-1:UT-T2 >
+  EGUnit           V
+  EguBandLow       0.0
+  EguBandHigh      300.0
+  AlarmLow         180.0
+  AlarmHigh        240.0
+  WarnLow          200.0
+  WarnHigh         230.0
+  DeadBand         3.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           18
+  RTU              RTU-1
+  Name             UT-T2
+  Info             Napon u fazi T T2
+[STOP]
+
+[ANAIN]   < RTU-1:FR-T2 >
+  EGUnit           Hz
+  EguBandLow       0.0
+  EguBandHigh      60.0
+  AlarmLow         45.0
+  AlarmHigh        55.0
+  WarnLow          45.0
+  WarnHigh         55.0
+  DeadBand         0.10
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           19
+  RTU              RTU-1
+  Name             FR-T2
+  Info             Frekvencija T2
+[STOP]
+
+[ANAIN]   < RTU-1:PA-T2 >
+  EGUnit           MW
+  EguBandLow       0.0
+  EguBandHigh      5.0
+  AlarmLow         1.0
+  AlarmHigh        4.80
+  WarnLow          2.0
+  WarnHigh         4.0
+  DeadBand         0.010000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           20
+  RTU              RTU-1
+  Name             PA-T2
+  Info             Aktivna snaga T2
+[STOP]
+
+[ANAIN]   < RTU-1:PR-T2 >
+  EGUnit           MVAr
+  EguBandLow       0.0
+  EguBandHigh      5.0
+  AlarmLow         1.0
+  AlarmHigh        4.80
+  WarnLow          2.0
+  WarnHigh         4.0
+  DeadBand         0.010000
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           21
+  RTU              RTU-1
+  Name             PR-T2
+  Info             Reaktivna snaga T2
+[STOP]
+
+[ANAIN]   < RTU-1:COSF-T1 >
+  EGUnit           -
+  EguBandLow       0.0
+  EguBandHigh      1.0
+  AlarmLow         0.20
+  AlarmHigh        1.0
+  WarnLow          0.40
+  WarnHigh         1.0
+  DeadBand         0.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           22
+  RTU              RTU-1
+  Name             COSF-T1
+  Info             Kosinus fi T1
+[STOP]
+
+[ANAIN]   < RTU-1:COSF-T2 >
+  EGUnit           -
+  EguBandLow       0.0
+  EguBandHigh      1.0
+  AlarmLow         0.20
+  AlarmHigh        1.0
+  WarnLow          0.40
+  WarnHigh         1.0
+  DeadBand         0.0
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           23
+  RTU              RTU-1
+  Name             COSF-T2
+  Info             Kosinus fi T2
+[STOP]
+
+[ANAIN]   < RTU-1:TEMP-T1 >
+  EGUnit           oC
+  EguBandLow       0.0
+  EguBandHigh      150.0
+  AlarmLow         20.0
+  AlarmHigh        130.0
+  WarnLow          40.0
+  WarnHigh         100.0
+  DeadBand         0.15
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           24
+  RTU              RTU-1
+  Name             TEMP-T1
+  Info             Temperatura ulja T1
+[STOP]
+
+[ANAIN]   < RTU-1:TEMP-T2 >
+  EGUnit           oC
+  EguBandLow       0.0
+  EguBandHigh      150.0
+  AlarmLow         20.0
+  AlarmHigh        130.0
+  WarnLow          40.0
+  WarnHigh         100.0
+  DeadBand         0.15
+  ElUnit           mA
+  ElBandLow        4.0
+  ElBandHigh       20.0
+  RawBandLow       800
+  RawBandHigh      4000
+  hwAddr           25
+  RTU              RTU-1
+  Name             TEMP-T2
+  Info             Temperatura ulja T2
+[STOP]
+
+[ANAOUT]   < RTU-1:AO-0 >
+  EGUnit           -
+  EguBandLow       0.00
+  EguBandHigh      100.00
+  AlarmLow         20.00
+  AlarmHigh        80.00
+  ClampBandLow     10.00
+  ClampBandHigh    90.00
+  DeadBand         1.00
+  MaxRate          37.00
+  ElUnit           mA
+  ElBandLow        4.00
+  ElBandHigh       20.00
+  RawBandLow       0
+  RawBandHigh      4095
+  hwAddr           0
+  RTU              RTU-1
+  Name             AO-0
+  Info             Analogni Izlaz 0
+[STOP]
+
+[ANAOUT]   < RTU-1:AO-1 >
+  EGUnit           -
+  EguBandLow       0.00
+  EguBandHigh      100.00
+  AlarmLow         20.00
+  AlarmHigh        80.00
+  ClampBandLow     10.00
+  ClampBandHigh    90.00
+  DeadBand         1.00
+  MaxRate          37.00
+  ElUnit           mA
+  ElBandLow        4.00
+  ElBandHigh       20.00
+  RawBandLow       0
+  RawBandHigh      4095
+  hwAddr           1
+  RTU              RTU-1
+  Name             AO-1
+  Info             Analogni Izlaz 1
+[STOP]
+
+[COUNTER]   < RTU-1:EA-T1 >
+  EGUnit           MWh
+  MulConst         1.0
+  DivConst         1000.0
+  DeadBand         0.01
+  WatchPeriod      30
+  AutoClear        ON
+  ClearHour        16
+  ClearMinute      10
+  hwAddr           0
+  RTU              RTU-1
+  Name             EA-T1
+  Info             Aktivna Energija T1
+[STOP]
+
+[COUNTER]   < RTU-1:ER-T1 >
+  EGUnit           MVArh
+  MulConst         1.0
+  DivConst         1000.0
+  DeadBand         0.001
+  WatchPeriod      30
+  AutoClear        ON
+  ClearHour        16
+  ClearMinute      11
+  hwAddr           1
+  RTU              RTU-1
+  Name             ER-T1
+  Info             Reakt. Energija T1
+[STOP]
+
+[COUNTER]   < RTU-1:EA-T2 >
+  EGUnit           MWh
+  MulConst         1.0
+  DivConst         1000.0
+  DeadBand         0.001
+  WatchPeriod      30
+  AutoClear        ON
+  ClearHour        16
+  ClearMinute      13
+  hwAddr           2
+  RTU              RTU-1
+  Name             EA-T2
+  Info             Aktivna Energija T2
+[STOP]
+
+[COUNTER]   < RTU-1:ER-T2 >
+  EGUnit           MVArh
+  MulConst         1.0
+  DivConst         1000.0
+  DeadBand         0.001
+  WatchPeriod      30
+  AutoClear        ON
+  ClearHour        16
+  ClearMinute      13
+  hwAddr           3
+  RTU              RTU-1
+  Name             ER-T2
+  Info             Reakt. Energija T2
+[STOP]
+
+[DIGITAL]   < RTU-1:PK-I21 >
+  Type             Prekidac
+  InputList
+    Input          0                   < 0 >
+    Input          1                   < 1 >
+  OutputList
+    Output         0                   < 0 >
+    Output         1                   < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             PK-I21
+  Info             Prekidac na I21
+[STOP]
+
+[DIGITAL]   < RTU-1:RS-I21 >
+  Type             Rastavljac
+  InputList
+    Input          2                   < 0 >
+    Input          3                   < 1 >
+  OutputList
+    Output         2                   < 0 >
+    Output         3                   < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS-I21
+  Info             Sab.Rastavljac I21
+[STOP]
+
+[DIGITAL]   < RTU-1:RPS-I21 >
+  Type             Rastavljac
+  InputList
+    Input          4                   < 0 >
+    Input          5                   < 1 >
+  OutputList
+    Output         4                   < 0 >
+    Output         5                   < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RPS-I21
+  Info             Rast.Pom.Sab Rp I21
+[STOP]
+
+[DIGITAL]   < RTU-1:RI-I21 >
+  Type             Rastavljac
+  InputList
+    Input          6                   < 0 >
+    Input          7                   < 1 >
+  OutputList
+    Output         6                   < 0 >
+    Output         7                   < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RI-I21
+  Info             Izlazni rast. I21
+[STOP]
+
+[DIGITAL]   < RTU-1:RZ-I21 >
+  Type             Uzemljivac
+  InputList
+    Input          8                   < 0 >
+    Input          9                   < 1 >
+  OutputList
+    Output         8                   < 0 >
+    Output         9                   < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RZ-I21
+  Info             Nozevi za uzem. I21
+[STOP]
+
+[DIGITAL]   < RTU-1:PK-T1 >
+  Type             Prekidac
+  InputList
+    Input          10                  < 0 >
+    Input          11                  < 1 >
+  OutputList
+    Output         10                  < 0 >
+    Output         11                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             PK-T1
+  Info             Prekidac T1
+[STOP]
+
+[DIGITAL]   < RTU-1:RS1-T1 >
+  Type             Rastavljac
+  InputList
+    Input          12                  < 0 >
+    Input          13                  < 1 >
+  OutputList
+    Output         12                  < 0 >
+    Output         13                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS1-T1
+  Info             Rastavljac 1 T1
+[STOP]
+
+[DIGITAL]   < RTU-1:RS2-T1 >
+  Type             Rastavljac
+  InputList
+    Input          14                  < 0 >
+    Input          15                  < 1 >
+  OutputList
+    Output         14                  < 0 >
+    Output         15                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS2-T1
+  Info             Rastavljac 2 T1
+[STOP]
+
+[DIGITAL]   < RTU-1:RZ-T1 >
+  Type             Rastavljac
+  InputList
+    Input          16                  < 0 >
+    Input          17                  < 1 >
+  OutputList
+    Output         16                  < 0 >
+    Output         17                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RZ-T1
+  Info             Nozevi za uzem. T1
+[STOP]
+
+[DIGITAL]   < RTU-1:PK-I22 >
+  Type             Prekidac
+  InputList
+    Input          18                  < 0 >
+    Input          19                  < 1 >
+  OutputList
+    Output         18                  < 0 >
+    Output         19                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             PK-I22
+  Info             Prekidac na I22
+[STOP]
+
+[DIGITAL]   < RTU-1:RS-I22 >
+  Type             Rastavljac
+  InputList
+    Input          20                  < 0 >
+    Input          21                  < 1 >
+  OutputList
+    Output         20                  < 0 >
+    Output         21                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS-I22
+  Info             Sab.Rast. I22
+[STOP]
+
+[DIGITAL]   < RTU-1:RPS-I22 >
+  Type             Rastavljac
+  InputList
+    Input          22                  < 0 >
+    Input          23                  < 1 >
+  OutputList
+    Output         22                  < 0 >
+    Output         23                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RPS-I22
+  Info             Rast.Pom.Sab Rp I22
+[STOP]
+
+[DIGITAL]   < RTU-1:RI-I22 >
+  Type             Rastavljac
+  InputList
+    Input          24                  < 0 >
+    Input          25                  < 1 >
+  OutputList
+    Output         24                  < 0 >
+    Output         25                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RI-I22
+  Info             Izlazni rast. I22
+[STOP]
+
+[DIGITAL]   < RTU-1:RZ-I22 >
+  Type             Uzemljivac
+  InputList
+    Input          26                  < 0 >
+    Input          27                  < 1 >
+  OutputList
+    Output         26                  < 0 >
+    Output         27                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RZ-I22
+  Info             Nozevi za uzem. I22
+[STOP]
+
+[DIGITAL]   < RTU-1:PK-T2 >
+  Type             Prekidac
+  InputList
+    Input          28                  < 0 >
+    Input          29                  < 1 >
+  OutputList
+    Output         28                  < 0 >
+    Output         29                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             PK-T2
+  Info             Prekidac T2
+[STOP]
+
+[DIGITAL]   < RTU-1:RS1-T2 >
+  Type             Rastavljac
+  InputList
+    Input          30                  < 0 >
+    Input          31                  < 1 >
+  OutputList
+    Output         30                  < 0 >
+    Output         31                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS1-T2
+  Info             Rastavljac 1 T2
+[STOP]
+
+[DIGITAL]   < RTU-1:RS2-T2 >
+  Type             Rastavljac
+  InputList
+    Input          32                  < 0 >
+    Input          33                  < 1 >
+  OutputList
+    Output         32                  < 0 >
+    Output         33                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RS2-T2
+  Info             Rastavljac 2 T2
+[STOP]
+
+[DIGITAL]   < RTU-1:RZ-T2 >
+  Type             Uzemljivac
+  InputList
+    Input          34                  < 0 >
+    Input          35                  < 1 >
+  OutputList
+    Output         34                  < 0 >
+    Output         35                  < 1 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             RZ-T2
+  Info             Nozevi za uzem. T2
+[STOP]
+
+[DIGITAL]   < RTU-1:SO-T1 >
+  Type             Kontaktor
+  InputList
+    Input          36                  < 0 >
+  OutputList
+    Output         36                  < 0 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             SO-T1
+  Info             Spoljno Osvetljenje
+[STOP]
+
+[DIGITAL]   < RTU-1:SO-T2 >
+  Type             Kontaktor
+  InputList
+    Input          37                  < 0 >
+  OutputList
+    Output         37                  < 0 >
+  CmdTimOut        30
+  RTU              RTU-1
+  Name             SO-T2
+  Info             Spoljno Osvetljenje
+[STOP]
+
+[DIGITAL]   < RTU-1:VPN-I21 >
+  Type             IndNapona
+  InputList
+    Input          38                  < 0 >
+  RTU              RTU-1
+  Name             VPN-I21
+  Info             Vod pod naponom I21
+[STOP]
+
+[DIGITAL]   < RTU-1:AKK-I21 >
+  Type             Automat
+  InputList
+    Input          39                  < 0 >
+  RTU              RTU-1
+  Name             AKK-I21
+  Info             Autom.Komandi I21
+[STOP]
+
+[DIGITAL]   < RTU-1:AMP-I21 >
+  Type             Automat
+  InputList
+    Input          40                  < 0 >
+  RTU              RTU-1
+  Name             AMP-I21
+  Info             Automat Mot.Prek.I21
+[STOP]
+
+[DIGITAL]   < RTU-1:ZKS-I21 >
+  Type             AutoProrada
+  InputList
+    Input          41                  < 0 >
+  RTU              RTU-1
+  Name             ZKS-I21
+  Info             J>>Zastita KS I21
+[STOP]
+
+[DIGITAL]   < RTU-1:ZTP-I21 >
+  Type             AutoProrada
+  InputList
+    Input          42                  < 0 >
+  RTU              RTU-1
+  Name             ZTP-I21
+  Info             Jt>I Term.Preop.I21
+[STOP]
+
+[DIGITAL]   < RTU-1:ZZS-I21 >
+  Type             AutoProrada
+  InputList
+    Input          43                  < 0 >
+  RTU              RTU-1
+  Name             ZZS-I21
+  Info             Jo>Zemlj.Zast. I21
+[STOP]
+
+[DIGITAL]   < RTU-1:VPN-T1 >
+  Type             IndNapona
+  InputList
+    Input          44                  < 0 >
+  RTU              RTU-1
+  Name             VPN-T1
+  Info             Vod pod naponom T1
+[STOP]
+
+[DIGITAL]   < RTU-1:OS-T1 >
+  Type             DigAlarm
+  InputList
+    Input          45                  < 0 >
+  RTU              RTU-1
+  Name             OS-T1
+  Info             SN Osigurac T1
+[STOP]
+
+[DIGITAL]   < RTU-1:BN-T1 >
+  Type             AutoNajava
+  InputList
+    Input          46                  < 0 >
+  RTU              RTU-1
+  Name             BN-T1
+  Info             Buholz najava T1
+[STOP]
+
+[DIGITAL]   < RTU-1:BP-T1 >
+  Type             AutoProrada
+  InputList
+    Input          47                  < 0 >
+  RTU              RTU-1
+  Name             BP-T1
+  Info             Buholz prorada T1
+[STOP]
+
+[DIGITAL]   < RTU-1:ZTP-T1 >
+  Type             AutoProrada
+  InputList
+    Input          48                  < 0 >
+  RTU              RTU-1
+  Name             ZTP-T1
+  Info             Jt>I Term.Preop.T1
+[STOP]
+
+[DIGITAL]   < RTU-1:DK-T1 >
+  Type             IndDKontrole
+  InputList
+    Input          49                  < 0 >
+  RTU              RTU-1
+  Name             DK-T1
+  Info             Dalj.Command T1
+[STOP]
+
+[DIGITAL]   < RTU-1:SF6-T2 >
+  Type             DigAlarm
+  InputList
+    Input          50                  < 0 >
+  RTU              RTU-1
+  Name             SF6-T2
+  Info             Pritisak SF6 T2
+[STOP]
+
+[DIGITAL]   < RTU-1:AC-T1 >
+  Type             DigAlarm
+  InputList
+    Input          51                  < 0 >
+  RTU              RTU-1
+  Name             AC-T1
+  Info             AC Napajanje T1
+[STOP]
+
+[DIGITAL]   < RTU-1:DC-T2 >
+  Type             DigAlarm
+  InputList
+    Input          70                  < 0 >
+  RTU              RTU-1
+  Name             DC-T2
+  Info             DC Napajanje T2
+[STOP]
+
+[DIGITAL]   < RTU-1:PROD-T1 >
+  Type             DigAlarm
+  InputList
+    Input          53                  < 0 >
+  RTU              RTU-1
+  Name             PROD-T1
+  Info             Prodor u T1
+[STOP]
+
+[DIGITAL]   < RTU-1:POZAR-T1 >
+  Type             DigAlarm
+  InputList
+    Input          54                  < 0 >
+  RTU              RTU-1
+  Name             POZAR-T1
+  Info             Pozar u T1
+[STOP]
+
+[DIGITAL]   < RTU-1:AMP-T1 >
+  Type             Automat
+  InputList
+    Input          55                  < 0 >
+  RTU              RTU-1
+  Name             AMP-T1
+  Info             AutomatMot.Prek.T1
+[STOP]
+
+[DIGITAL]   < RTU-1:VPN-I22 >
+  Type             IndNapona
+  InputList
+    Input          56                  < 0 >
+  RTU              RTU-1
+  Name             VPN-I22
+  Info             Vod pod naponom I22
+[STOP]
+
+[DIGITAL]   < RTU-1:AKK-I22 >
+  Type             Automat
+  InputList
+    Input          57                  < 0 >
+  RTU              RTU-1
+  Name             AKK-I22
+  Info             Autom.Komandi I22
+[STOP]
+
+[DIGITAL]   < RTU-1:AMP-I22 >
+  Type             Automat
+  InputList
+    Input          58                  < 0 >
+  RTU              RTU-1
+  Name             AMP-I22
+  Info             AutomatMot.Prek.I22
+[STOP]
+
+[DIGITAL]   < RTU-1:ZKS-I22 >
+  Type             AutoProrada
+  InputList
+    Input          59                  < 0 >
+  RTU              RTU-1
+  Name             ZKS-I22
+  Info             J>>Zastita KS I22
+[STOP]
+
+[DIGITAL]   < RTU-1:ZTP-I22 >
+  Type             AutoProrada
+  InputList
+    Input          60                  < 0 >
+  RTU              RTU-1
+  Name             ZTP-I22
+  Info             Jt>I Term.Preop.I22
+[STOP]
+
+[DIGITAL]   < RTU-1:ZZS-I22 >
+  Type             AutoProrada
+  InputList
+    Input          61                  < 0 >
+  RTU              RTU-1
+  Name             ZZS-I22
+  Info             Jo>Zemlj.Zast. I22
+[STOP]
+
+[DIGITAL]   < RTU-1:VPN-T2 >
+  Type             IndNapona
+  InputList
+    Input          62                  < 0 >
+  RTU              RTU-1
+  Name             VPN-T2
+  Info             Vod pod naponom T2
+[STOP]
+
+[DIGITAL]   < RTU-1:OS-T2 >
+  Type             DigAlarm
+  InputList
+    Input          63                  < 0 >
+  RTU              RTU-1
+  Name             OS-T2
+  Info             SN Osigurac T2
+[STOP]
+
+[DIGITAL]   < RTU-1:BN-T2 >
+  Type             AutoNajava
+  InputList
+    Input          64                  < 0 >
+  RTU              RTU-1
+  Name             BN-T2
+  Info             Buholz najava T2
+[STOP]
+
+[DIGITAL]   < RTU-1:BP-T2 >
+  Type             AutoProrada
+  InputList
+    Input          65                  < 0 >
+  RTU              RTU-1
+  Name             BP-T2
+  Info             Buholz prorada T2
+[STOP]
+
+[DIGITAL]   < RTU-1:ZTP-T2 >
+  Type             AutoProrada
+  InputList
+    Input          66                  < 0 >
+  RTU              RTU-1
+  Name             ZTP-T2
+  Info             Jt>I Term.Preop.T2
+[STOP]
+
+[DIGITAL]   < RTU-1:DK-T2 >
+  Type             IndDKontrole
+  InputList
+    Input          67                  < 0 >
+  RTU              RTU-1
+  Name             DK-T2
+  Info             Dalj.Command T2
+[STOP]
+
+[DIGITAL]   < RTU-1:SF6-T1 >
+  Type             DigAlarm
+  InputList
+    Input          68                  < 0 >
+  RTU              RTU-1
+  Name             SF6-T1
+  Info             Pritisak SF6 T1
+[STOP]
+
+[DIGITAL]   < RTU-1:AC-T2 >
+  Type             DigAlarm
+  InputList
+    Input          69                  < 0 >
+  RTU              RTU-1
+  Name             AC-T2
+  Info             AC Napajanje T2
+[STOP]
+
+[DIGITAL]   < RTU-1:DC-T1 >
+  Type             DigAlarm
+  InputList
+    Input          52                  < 0 >
+  RTU              RTU-1
+  Name             DC-T1
+  Info             DC Napajanje T1
+[STOP]
+
+[DIGITAL]   < RTU-1:PROD-T2 >
+  Type             DigAlarm
+  InputList
+    Input          71                  < 0 >
+  RTU              RTU-1
+  Name             PROD-T2
+  Info             Prodor u T2
+[STOP]
+
+[DIGITAL]   < RTU-1:POZAR-T2 >
+  Type             DigAlarm
+  InputList
+    Input          72                  < 0 >
+  RTU              RTU-1
+  Name             POZAR-T2
+  Info             Pozar u T2
+[STOP]
+
+[DIGITAL]   < RTU-1:AMP-T2 >
+  Type             Automat
+  InputList
+    Input          73                  < 0 >
+  RTU              RTU-1
+  Name             AMP-T2
+  Info             AutomatMot.Prek.T2
+[STOP]
+
+[OBJECT]   < RTU-1:IZV-I21 >
+  Type             Izvod
+  NoElem           11
+  ElemList
+    Element        RTU-1 : RS-I21                < 0  RS >
+    Element        RTU-1 : PK-I21                < 1  PK >
+    Element        RTU-1 : RI-I21                < 2  RI >
+    Element        RTU-1 : RPS-I21               < 3  RPS >
+    Element        RTU-1 : RZ-I21                < 4  RZ >
+    Element        RTU-1 : JS-I21                < 5  JS >
+    Element        RTU-1 : US-I21                < 6  US >
+    Element        RTU-1 : ZKS-I21               < 7  ZKS >
+    Element        RTU-1 : ZZS-I21               < 8  ZZS >
+    Element        RTU-1 : ZTP-I21               < 9  ZTP >
+    Element        RTU-1 : VPN-I21               < 10 VPN >
+  NoParam          0
+  RTU              RTU-1
+  Name             IZV-I21
+  Info             Izvod I21
+[STOP]
+
+[OBJECT]   < RTU-1:IZV-I22 >
+  Type             Izvod
+  NoElem           11
+  ElemList
+    Element        RTU-1 : RS-I22                < 0  RS >
+    Element        RTU-1 : PK-I22                < 1  PK >
+    Element        RTU-1 : RI-I22                < 2  RI >
+    Element        RTU-1 : RPS-I22               < 3  RPS >
+    Element        RTU-1 : RZ-I22                < 4  RZ >
+    Element        RTU-1 : JS-I22                < 5  JS >
+    Element        RTU-1 : US-I22                < 6  US >
+    Element        RTU-1 : ZKS-I22               < 7  ZKS >
+    Element        RTU-1 : ZZS-I22               < 8  ZZS >
+    Element        RTU-1 : ZTP-I22               < 9  ZTP >
+    Element        RTU-1 : VPN-I22               < 10 VPN >
+  NoParam          0
+  RTU              RTU-1
+  Name             IZV-I22
+  Info             Izvod I22
+[STOP]
+
+[OBJECT]   < RTU-1:TF-T1 >
+  Type             Trafo
+  NoElem           17
+  ElemList
+    Element        RTU-1 : JR-T1                 < 0  JR >
+    Element        RTU-1 : JS-T1                 < 1  JS >
+    Element        RTU-1 : JT-T1                 < 2  JT >
+    Element        RTU-1 : UR-T1                 < 3  UR >
+    Element        RTU-1 : US-T1                 < 4  US >
+    Element        RTU-1 : UT-T1                 < 5  UT >
+    Element        RTU-1 : FR-T1                 < 6  FR >
+    Element        RTU-1 : COSF-T1               < 7  COSF >
+    Element        RTU-1 : PA-T1                 < 8  PA >
+    Element        RTU-1 : PR-T1                 < 9  PR >
+    Element        RTU-1 : TEMP-T1               < 10 TEMP >
+    Element        RTU-1 : EA-T1                 < 11 EA >
+    Element        RTU-1 : ER-T1                 < 12 ER >
+    Element        RTU-1 : OS-T1                 < 13 OS >
+    Element        RTU-1 : BN-T1                 < 14 BN >
+    Element        RTU-1 : BP-T1                 < 15 BP >
+    Element        RTU-1 : ZTP-T1                < 16 ZTP >
+  NoParam          0
+  RTU              RTU-1
+  Name             TF-T1
+  Info             Trafo T1
+[STOP]
+
+[OBJECT]   < RTU-1:TF-T2 >
+  Type             Trafo
+  NoElem           17
+  ElemList
+    Element        RTU-1 : JR-T2                 < 0  JR >
+    Element        RTU-1 : JS-T2                 < 1  JS >
+    Element        RTU-1 : JT-T2                 < 2  JT >
+    Element        RTU-1 : UR-T2                 < 3  UR >
+    Element        RTU-1 : US-T2                 < 4  US >
+    Element        RTU-1 : UT-T2                 < 5  UT >
+    Element        RTU-1 : FR-T2                 < 6  FR >
+    Element        RTU-1 : COSF-T2               < 7  COSF >
+    Element        RTU-1 : PA-T2                 < 8  PA >
+    Element        RTU-1 : PR-T2                 < 9  PR >
+    Element        RTU-1 : TEMP-T2               < 10 TEMP >
+    Element        RTU-1 : EA-T2                 < 11 EA >
+    Element        RTU-1 : ER-T2                 < 12 ER >
+    Element        RTU-1 : OS-T2                 < 13 OS >
+    Element        RTU-1 : BN-T2                 < 14 BN >
+    Element        RTU-1 : BP-T2                 < 15 BP >
+    Element        RTU-1 : ZTP-T2                < 16 ZTP >
+  NoParam          0
+  RTU              RTU-1
+  Name             TF-T2
+  Info             Trafo T2
+[STOP]
+
+[OBJECT]   < RTU-1:SAB-T1 >
+  Type             Sabirnica
+  NoElem           5
+  ElemList
+    Element        RTU-1 : PK-T1                 < 0  PK >
+    Element        RTU-1 : RS1-T1                < 1  RS1 >
+    Element        RTU-1 : RS2-T1                < 2  RS2 >
+    Element        RTU-1 : RZ-T1                 < 3  RZ >
+    Element        RTU-1 : VPN-T1                < 4  VPN >
+  NoParam          2
+  ParamList
+    Parameter      1.11                          < 0  TipASDU >
+    Parameter      2.22                          < 1  AdrIOBJ >
+  RTU              RTU-1
+  Name             SAB-T1
+  Info             Sabirnica T1
+[STOP]
+
+[OBJECT]   < RTU-1:SAB-T2 >
+  Type             Sabirnica
+  NoElem           5
+  ElemList
+    Element        RTU-1 : PK-T2                 < 0  PK >
+    Element        RTU-1 : RS1-T2                < 1  RS1 >
+    Element        RTU-1 : RS2-T2                < 2  RS2 >
+    Element        RTU-1 : RZ-T2                 < 3  RZ >
+    Element        RTU-1 : VPN-T2                < 4  VPN >
+  NoParam          2
+  ParamList
+    Parameter      1.11                          < 0  TipASDU >
+    Parameter      2.22                          < 1  AdrIOBJ >
+  RTU              RTU-1
+  Name             SAB-T2
+  Info             Sabirnica T2
+[STOP]
+
+[OBJECT]   < RTU-1:SP-T1+T2 >
+  Type             Spojnica
+  NoElem           4
+  ElemList
+    Element        RTU-1 : SAB-T1                < 0  Sabirnica1 >
+    Element        RTU-1 : SAB-T2                < 1  Sabirnica2 >
+    Element        RTU-1 : RS2-T1                < 2  Rastavljac1 >
+    Element        RTU-1 : RS1-T2                < 3  Rastavljac2 >
+  NoParam          0
+  RTU              RTU-1
+  Name             SP-T1+T2
+  Info             Spojnica T1 i T2
+[STOP]
+
+[OBJECT]   < RTU-1:PA-T1+T2 >
+  Type             Suma
+  EGUnit           MW
+  NoElem           2
+  ElemList
+    Element        RTU-1 : PA-T1                 < 0  Sabirak1 >
+    Element        RTU-1 : PA-T2                 < 1  Sabirak2 >
+  NoParam          0
+  RTU              RTU-1
+  Name             PA-T1+T2
+  Info             Aktivna snaga 1+2
+[STOP]
+
+[OBJECT]   < RTU-1:PR-T1+T2 >
+  Type             Suma
+  EGUnit           MVAr
+  NoElem           2
+  ElemList
+    Element        RTU-1 : PR-T1                 < 0  Sabirak1 >
+    Element        RTU-1 : PR-T2                 < 1  Sabirak2 >
+  NoParam          0
+  RTU              RTU-1
+  Name             PR-T1+T2
+  Info             Reaktivna snaga 1+2
+[STOP]
+
+[END]   < SN sistem - DEMO2 >
+

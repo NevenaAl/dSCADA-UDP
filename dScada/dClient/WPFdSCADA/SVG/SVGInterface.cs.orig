@@ -1,0 +1,1170 @@
+﻿using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using WpfDSCADA.Catalogs;
+using System.Collections.Generic;
+
+
+namespace WpfDSCADA.SVG
+{
+	public class SVGInterface
+	{
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* GLOBALS                                                                                                  */
+		/*----------------------------------------------------------------------------------------------------------*/
+		public SVGParser svgParser = new SVGParser();
+		public SVGPage svgPage;
+		Canvas globalImabeContainer;
+		BrushConverter colorConverter = new BrushConverter();//Object used to convert color from string (etc #00 00 00 00)
+
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* METHODS                                                                                                  */
+		/*----------------------------------------------------------------------------------------------------------*/
+
+		public bool OpenSVGFromFile(String filePath, Canvas imageContainer, bool withFileOpenDlg)
+		{
+			if (withFileOpenDlg)//if we wont to use OpenFileDialog
+			{
+				Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+				dlg.InitialDirectory = Environment.CurrentDirectory + @"\SVG files";
+				dlg.FileName = "SVG Files"; // Default file name
+				dlg.DefaultExt = ".svg"; // Default file extension
+				dlg.Filter = "SVG files (.svg)|*.svg"; // Filter files by extension
+
+				Nullable<bool> result = dlg.ShowDialog();
+
+				if (result == true)
+				{
+					SVGRoot(dlg.FileName, imageContainer);
+					return true;
+				}
+				return false;
+			}
+			else
+			{
+				SVGRoot(filePath, imageContainer);
+				return true;
+			}
+
+		}
+
+		public void SVGRoot(String SVGFilePath, Canvas imageContainer)
+		{
+			globalImabeContainer = imageContainer;
+
+			if (!svgParser.page_list.ContainsKey(SVGFilePath))
+			{
+				svgParser.ParseSVGFile(SVGFilePath);
+			}
+
+			svgParser.page_list.TryGetValue(SVGFilePath, out svgPage);
+
+			imageContainer.Width = svgPage.maxx;
+			imageContainer.Height = svgPage.maxy;
+
+			//DrawPage(imageContainer);
+		}
+
+		//void OpenAllActiveElements()
+		//{
+		//   foreach (SVGShape shape in pageSVG.shape_list)
+		//   {
+		//      if (shape.shapeType == ElemType.SHAPE_ACTIV)
+		//      {
+		//         shape.shapeState = ElemState.STATE_OPEN;
+		//      }
+		//   }
+		//}
+
+		public void DrawPage(Canvas pageImageContainer)
+		{
+			pageImageContainer.Children.Clear();
+			foreach (SVGShape shape in svgPage.shape_list)
+			{
+				DrawShape(pageImageContainer, shape);
+			}
+		}
+
+		public void DrawShape(Canvas pageImageContainer, SVGShape shape)
+		{
+			Image pathShapeImage = new Image();
+			DrawingImage drawingContanier = new DrawingImage();
+			GeometryDrawing geometryDrawing = new GeometryDrawing();
+			StreamGeometry g = new StreamGeometry();
+			Brush drawingBrush;
+
+			TransformGroup transformGroup = new TransformGroup();
+
+			switch (shape.typeOfShape)
+			{
+				#region case SVGSHAPETYPE.SVG_SYMBOL:
+				case SVGSHAPETYPE.SVG_SYMBOL:
+					if (shape.colorCode != "")
+					{
+						drawingBrush = colorConverter.ConvertFromString(shape.colorCode) as Brush;
+					}
+					else
+					{
+						drawingBrush = Brushes.White;
+					}
+
+					geometryDrawing.Pen = new Pen(drawingBrush, 1);
+
+					if (shape.path_list.Count != 0)
+					{
+						using (StreamGeometryContext context = g.Open())//tako to ide za streamGeometry :)
+						{
+							foreach (SVGPath p in shape.path_list)
+							{
+
+								if (p.style != null)
+								{
+									geometryDrawing.Pen.Thickness = p.style.GetStroke().width;
+								}
+
+								switch (p.cmd)
+								{
+									case SVGPATHCMD.SVG_PATH_CMD_MOVE_TO:
+										context.BeginFigure(new Point(p.coords_list[0], p.coords_list[1]), false, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_LINE_TO:
+										context.LineTo(new Point(p.coords_list[0], p.coords_list[1]), true, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_ARC_TO:
+										if (p.coords_list[4] != 0)
+											context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Clockwise, true, false);
+										else
+											context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Counterclockwise, true, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_CLOSE_PATH://if the path is closed than we need to set isClosed atribute in starting point from false to true
+										//Note to my self: Ovo je u principu jako lose resenje jer radi samo za slucaj da je prvi path zatvoren .. u ostalim slucajevima svi prethodni ce biti obrisani(u datim primerima shema se savrseno uklapa:)
+										g.Clear();
+										geometryDrawing.Brush = colorConverter.ConvertFromString(p.style.fillColor) as Brush;
+										switch (p.cmd)
+										{
+											case SVGPATHCMD.SVG_PATH_CMD_MOVE_TO:
+												context.BeginFigure(new Point(p.coords_list[0], p.coords_list[1]), false, true);
+												break;
+
+											case SVGPATHCMD.SVG_PATH_CMD_LINE_TO:
+												context.LineTo(new Point(p.coords_list[0], p.coords_list[1]), true, false);
+												break;
+
+											case SVGPATHCMD.SVG_PATH_CMD_ARC_TO: //7 koordinata
+												if (p.coords_list[4] != 0)
+													context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Clockwise, true, false);
+												else
+													context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Counterclockwise, true, false);
+												break;
+										}
+										break;
+
+									default:
+										break;
+								}
+							}//foreach
+						}//using
+
+						//Transformation processing
+						transformGroup = new TransformGroup();
+						if (shape.transform.rotate != 0)
+						{
+							transformGroup.Children.Add(new RotateTransform(shape.transform.rotate));
+						}
+						if ((shape.transform.translate_0 != 0) || (shape.transform.translate_1 != 0))
+						{
+							transformGroup.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1));
+						}
+						if ((shape.transform.scale_0 != 0) || (shape.transform.scale_1 != 0))
+						{
+							transformGroup.Children.Add(new ScaleTransform(shape.transform.scale_0, shape.transform.scale_1));
+						}
+						if (transformGroup.Children.Count > 0)//ako ima vise transformacija
+						{
+							g.Transform = transformGroup;
+						}
+
+						geometryDrawing.Geometry = g;
+						drawingContanier.Drawing = geometryDrawing;
+						pathShapeImage.Source = drawingContanier;
+						pageImageContainer.Children.Add(pathShapeImage);
+
+						//Placing image on exact coordinates in canvas
+						pathShapeImage.SetValue(Canvas.LeftProperty, g.Bounds.X);
+						pathShapeImage.SetValue(Canvas.TopProperty, g.Bounds.Y);
+
+						//Generic nameing of images (like ShapeNo1)
+						pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+
+						//Adding exeption handler function on MouseClick
+						pathShapeImage.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseLeftButtonDown);
+						pathShapeImage.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseRightButtonDown);
+					}
+					 if (shape.rectangle != null && shape.typeOfShape != SVGSHAPETYPE.SVG_PV_LABEL)
+					{
+                        Rect rectS = new Rect();
+                        rectS.X = shape.rectangle[0];
+                        rectS.Y = shape.rectangle[1];
+                        rectS.Width = shape.rectangle[2];
+                        rectS.Height = shape.rectangle[3];
+
+                        RectangleGeometry rectSG = new RectangleGeometry(rectS, 2, 2);
+
+                        geometryDrawing.Geometry = rectSG;
+                        //geometryDrawing.Brush = (Brush)colorConverter.ConvertFromString(shape.colorCode);
+                        if (shape.colorCode == "")
+                        {
+                            geometryDrawing.Pen = new Pen(Brushes.White, shape.rectangle_style.GetStrokeWidth());
+                        }
+                        else
+                        {
+                            geometryDrawing.Pen = new Pen((Brush)colorConverter.ConvertFromString(shape.colorCode), shape.rectangle_style.GetStrokeWidth());
+                        }
+                        drawingContanier.Drawing = geometryDrawing;
+
+                        pathShapeImage.Source = drawingContanier;
+                        pageImageContainer.Children.Add(pathShapeImage);
+
+                        //Placing image on exact coordinates in canvas
+                        pathShapeImage.SetValue(Canvas.LeftProperty, shape.rectangle[0] + shape.transform.translate_0);
+                        pathShapeImage.SetValue(Canvas.TopProperty, shape.rectangle[1] + shape.transform.translate_1);
+
+                        //Generic nameing of images (like ShapeNo1)
+                        pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+						
+					}
+					 if (shape.ellipse != null)
+					{
+                        EllipseGeometry ellipseG = new EllipseGeometry(new Point(shape.ellipse[0], shape.ellipse[1]), shape.ellipse[2], shape.ellipse[3]);
+
+                        geometryDrawing.Geometry = ellipseG;
+                        if (shape.colorCode != "")
+                        {
+                            geometryDrawing.Brush = (Brush)colorConverter.ConvertFromString(shape.colorCode);
+                        }
+                        else
+                        {
+                            geometryDrawing.Brush = Brushes.White;
+                        }
+                        drawingContanier.Drawing = geometryDrawing;
+                        pathShapeImage.Source = drawingContanier;
+                        pageImageContainer.Children.Add(pathShapeImage);
+
+                        //Placing image on exact coordinates in canvas
+                        pathShapeImage.SetValue(Canvas.LeftProperty, shape.ellipse[0] + shape.transform.translate_0 - 6); // ove modifikacije su potrebne iz nepoznatog razloga ... ne iscrtava gde bi trebalo
+                        pathShapeImage.SetValue(Canvas.TopProperty, shape.ellipse[1] + shape.transform.translate_1 -6);  // pa ove modifikacije ga postave na mesto
+
+                        //Generic nameing of images (like ShapeNo1)
+                        pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+
+						//Adding exeption handler function on MouseClick
+						//pathShapeImage.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseLeftButtonDown);
+						pathShapeImage.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseRightButtonDown);
+					
+					}
+					 if (shape._text.text != "") // if there is some text with the shape we call DrawText function
+					 {
+						 DrawText(pageImageContainer, shape, shape._text.x, shape._text.y);
+					 }
+
+					break;
+				#endregion
+				#region case SVGSHAPETYPE.SVG_PV_LABEL:
+				case SVGSHAPETYPE.SVG_PV_LABEL:
+					if (shape._text.text != "") // if there is some text with the shape we call DrowText function
+					{
+						DrawText(pageImageContainer, shape, shape._text.x, shape._text.y);
+					}
+
+					break;
+				#endregion
+				#region case SVGSHAPETYPE.SVG_BUTTON:
+				case SVGSHAPETYPE.SVG_BUTTON:
+					Rect rect = new Rect();
+					rect.X = shape.rectangle[0];
+					rect.Y = shape.rectangle[1];
+					rect.Width = shape.rectangle[2];
+					rect.Height = shape.rectangle[3];
+
+					RectangleGeometry rectG = new RectangleGeometry(rect, 2, 2);
+
+					geometryDrawing.Geometry = rectG;
+					geometryDrawing.Brush = (Brush)colorConverter.ConvertFromString(shape.colorCode);
+					drawingContanier.Drawing = geometryDrawing;
+					pathShapeImage.Source = drawingContanier;
+					pageImageContainer.Children.Add(pathShapeImage);
+
+					//Placing image on exact coordinates in canvas
+					pathShapeImage.SetValue(Canvas.LeftProperty, shape.rectangle[0] + shape.transform.translate_0);
+					pathShapeImage.SetValue(Canvas.TopProperty, shape.rectangle[1] + shape.transform.translate_1 );
+
+					//Generic nameing of images (like ShapeNo1)
+					pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+
+					//Adding exeption handler function on MouseClick
+					pathShapeImage.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseLeftButtonDown);
+					//pathShapeImage.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseRightButtonDown);
+					
+					break;
+				#endregion
+				#region case SVGSHAPETYPE.SVG_UNKNOWN:
+				case SVGSHAPETYPE.SVG_UNKNOWN:
+
+					if (shape.path_list.Count > 0)
+					{
+						drawingBrush = Brushes.White;
+
+						geometryDrawing.Pen = new Pen(drawingBrush, 1);
+
+						using (StreamGeometryContext context = g.Open())
+						{
+							foreach (SVGPath p in shape.path_list)
+							{
+								if (p.style != null)
+								{
+									geometryDrawing.Pen.Thickness = p.style.GetStrokeWidth();
+                                    if (p.style.GetStrokeColor() == "#FF000000")
+                                    {
+                                        geometryDrawing.Pen.Brush = Brushes.White;
+                                    }
+                                    else
+                                    {
+                                        geometryDrawing.Pen.Brush = colorConverter.ConvertFromString(p.style.GetStrokeColor()) as Brush;
+                                    }
+								}
+
+								switch (p.cmd)
+								{
+									case SVGPATHCMD.SVG_PATH_CMD_MOVE_TO:
+										context.BeginFigure(new Point(p.coords_list[0], p.coords_list[1]), false, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_LINE_TO:
+										context.LineTo(new Point(p.coords_list[0], p.coords_list[1]), true, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_ARC_TO:
+										if (p.coords_list[4] != 0)
+											context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Clockwise, true, false);
+										else
+											context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Counterclockwise, true, false);
+										break;
+
+									case SVGPATHCMD.SVG_PATH_CMD_CLOSE_PATH:								
+										g.Clear();
+										geometryDrawing.Brush = colorConverter.ConvertFromString(p.style.fillColor) as Brush;
+										switch (p.cmd)
+										{
+											case SVGPATHCMD.SVG_PATH_CMD_MOVE_TO:
+												context.BeginFigure(new Point(p.coords_list[0], p.coords_list[1]), false, true);
+												break;
+
+											case SVGPATHCMD.SVG_PATH_CMD_LINE_TO:
+												context.LineTo(new Point(p.coords_list[0], p.coords_list[1]), true, false);
+												break;
+
+											case SVGPATHCMD.SVG_PATH_CMD_ARC_TO: //7 koordinata
+												if (p.coords_list[4] != 0)
+													context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Clockwise, true, false);
+												else
+													context.ArcTo(new Point(p.coords_list[5], p.coords_list[6]), new Size(p.coords_list[0], p.coords_list[1]), p.coords_list[2], Convert.ToBoolean(p.coords_list[3]), SweepDirection.Counterclockwise, true, false);
+												break;
+										}
+										break;
+
+									default:
+										break;
+								}
+							}//foreach
+						}//using
+
+						//Transformation processing
+						transformGroup = new TransformGroup();
+						if (shape.transform.rotate != 0)
+						{
+							transformGroup.Children.Add(new RotateTransform(shape.transform.rotate));
+						}
+						if ((shape.transform.translate_0 != 0) || (shape.transform.translate_1 != 0))
+						{
+							transformGroup.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1));
+						}
+						if ((shape.transform.scale_0 != 0) || (shape.transform.scale_1 != 0))
+						{
+							transformGroup.Children.Add(new ScaleTransform(shape.transform.scale_0, shape.transform.scale_1));
+						}
+						if (transformGroup.Children.Count > 0)//ako ima vise transformacija
+						{
+							g.Transform = transformGroup;
+						}
+
+						geometryDrawing.Geometry = g;
+						drawingContanier.Drawing = geometryDrawing;
+						pathShapeImage.Source = drawingContanier;
+						pageImageContainer.Children.Add(pathShapeImage);
+
+						//Placing image on exact coordinates in canvas
+						pathShapeImage.SetValue(Canvas.LeftProperty, g.Bounds.X);
+						pathShapeImage.SetValue(Canvas.TopProperty, g.Bounds.Y);
+
+						//Generic nameing of images (like ShapeNo1)
+						pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+					}
+
+					else if (shape._text.text != "")
+					{
+						DrawText(pageImageContainer, shape, shape._text.x, shape._text.y);
+					}
+
+					else if (shape.rectangle != null && shape._text.text == "")
+					{
+                        Rect rectS = new Rect();
+                        rectS.X = shape.rectangle[0];
+                        rectS.Y = shape.rectangle[1];
+                        rectS.Width = shape.rectangle[2];
+                        rectS.Height = shape.rectangle[3];
+
+                        RectangleGeometry rectSG = new RectangleGeometry(rectS, 2, 2);
+
+                        geometryDrawing.Geometry = rectSG;
+
+                        if (shape.rectangle_style.GetStrokeColor() == "#FF000000")
+                        {
+                            geometryDrawing.Pen.Brush = Brushes.White;
+                        }
+                        else
+                        {
+                            geometryDrawing.Pen = new Pen((Brush)colorConverter.ConvertFromString(shape.rectangle_style.GetStrokeColor()), shape.rectangle_style.GetStrokeWidth());
+                        }
+
+                        drawingContanier.Drawing = geometryDrawing;
+
+                        pathShapeImage.Source = drawingContanier;
+                        pageImageContainer.Children.Add(pathShapeImage);
+
+                        //Placing image on exact coordinates in canvas
+                        pathShapeImage.SetValue(Canvas.LeftProperty, shape.rectangle[0] + shape.transform.translate_0);
+                        pathShapeImage.SetValue(Canvas.TopProperty, shape.rectangle[1] + shape.transform.translate_1);
+
+                        //Generic nameing of images (like ShapeNo1)
+                        pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+					}
+
+                    else if (shape.ellipse != null)
+                    {
+                        EllipseGeometry ellipseG = new EllipseGeometry(new Point(shape.ellipse[0], shape.ellipse[1]), shape.ellipse[2], shape.ellipse[3]);
+
+                        geometryDrawing.Geometry = ellipseG;
+
+                        if (shape.ellipse_style.GetStrokeColor() == "#FF000000")
+                        {
+                            geometryDrawing.Pen.Brush = Brushes.White;
+                        }
+                        else
+                        {
+                            geometryDrawing.Pen = new Pen((Brush)colorConverter.ConvertFromString(shape.ellipse_style.GetStrokeColor()), shape.ellipse_style.GetStrokeWidth());
+                        }
+                        drawingContanier.Drawing = geometryDrawing;
+                        pathShapeImage.Source = drawingContanier;
+                        pageImageContainer.Children.Add(pathShapeImage);
+
+                        //Placing image on exact coordinates in canvas
+                        pathShapeImage.SetValue(Canvas.LeftProperty, shape.ellipse[0] + shape.transform.translate_0 ); // ove modifikacije su potrebne iz nepoznatog razloga ... ne iscrtava gde bi trebalo
+                        pathShapeImage.SetValue(Canvas.TopProperty, shape.ellipse[1] + shape.transform.translate_1 );  // pa ove modifikacije ga postave na mesto
+
+                        //Generic nameing of images (like ShapeNo1)
+                        pathShapeImage.Name = "ShapeNo" + shape.mID.ToString();
+                    }
+
+					break;
+				#endregion
+				default:
+					break;
+			}
+		}
+
+		#region old methods
+		//private void DrawRectangle(Canvas pageImageContainer, SVGShape shape)
+		//{
+		//    Rectangle rect = new Rectangle();
+
+		//    rect.Stroke = colorConverter.ConvertFromString(shape.colorCode) as Brush;
+		//    rect.Height = shape.rectangle[3];
+		//    rect.Width = shape.rectangle[2];
+
+		//    //Transformation processing
+		//    TransformGroup transformGrupRect = new TransformGroup();
+		//    if (shape.transform.rotate != 0)//znaci treba rotirati ;)                        
+		//        transformGrupRect.Children.Add(new RotateTransform(shape.transform.rotate));
+		//    if ((shape.transform.translate_0 != 0) || (shape.transform.translate_1 != 0))
+		//        if (shape.typeOfShape == SVGSHAPETYPE.SVG_BUTTON)
+		//        {
+		//            transformGrupRect.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1 + 8));
+		//        }
+		//        else
+		//        {
+		//            transformGrupRect.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1));
+		//        }
+		//    if ((shape.transform.scale_0 != 0) || (shape.transform.scale_1 != 0))
+		//        transformGrupRect.Children.Add(new ScaleTransform(shape.transform.scale_0, shape.transform.scale_1));
+		//    if (transformGrupRect.Children.Count > 0)//ako ima vise transformacija
+		//        rect.RenderTransform = transformGrupRect;
+
+		//}
+
+		//public void DrowText(Canvas pageImageContainer, SVGShape shape, double X, double Y)
+		//{
+		//   TextBlock textBlock = new TextBlock();
+		//   //Font adjustment           
+		//   //Note to my self: Ovde ima mesta za dalja fina podesavnja
+		//   if (shape._text.style.font.family != "")
+		//   {
+		//      textBlock.FontFamily = new FontFamily(shape._text.style.font.family);
+		//   }
+		//   if (shape._text.style.font.size != "")
+		//   {                                        //set the font size only if there are any value defined
+		//      if (shape._text.style.font.size.Contains("em"))
+		//      {//returns true if "em" accurs
+		//         textBlock.FontSize = textBlock.FontSize * Convert.ToDouble(shape._text.style.font.size.Replace("em", ""));//size string is given in format(0.499em).EM means "emphemeral unit" which is relative to the current font size.For example, if the current font size was set to 16px, then the bottom padding would be set to 160px.
+		//      }
+		//      else
+		//      {//if size valu is given without in normal format without em                
+		//         textBlock.FontSize = Convert.ToDouble(shape._text.style.font.size);
+		//      }
+		//   }
+		//   if (shape._text.style.stroke.color != "")
+		//   {
+		//      try
+		//      {
+		//         textBlock.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(shape._text.style.stroke.color);
+		//      }
+		//      catch (Exception e)
+		//      {
+		//         textBlock.Foreground = Brushes.Black;
+		//      }
+		//   }
+		//   else
+		//   {
+		//      textBlock.Foreground = Brushes.Black;
+		//   }
+
+		//   textBlock.Text = shape._text.text;
+
+		//   #region Transform
+		//   //bool imaRotate = false;
+		//   ////Note to my self: Neki simboli (uglavnom oni koji su poredjani vertiklalno imaju neke lude transformacije (pre svega trenslate(mnogo,mnogo) pa se tekst pored tih simbola ne iscrtava na kanvasu vec negde daleko ispod ali to nije na meni da vodim racuna o tome
+		//   ////Transformation processing
+		//   //TransformGroup transformGrupText = new TransformGroup();
+
+		//   //if (shape.transform.rotate != 0)
+		//   //{
+		//   //    transformGrupText.Children.Add(new RotateTransform(shape.transform.rotate));
+		//   //    imaRotate = true;
+		//   //}
+
+		//   //if ((shape.transform.translate_0 != 0) || (shape.transform.translate_1 != 0))
+		//   //{
+		//   //    if (imaRotate)
+		//   //    {
+		//   //        //Note to my self: AKO IMA ROTACIJE ONDA NE UZIMAMO U OBZIR TRANSLACIJU VEC STAVLJAMO TEKST NA OSNOVU SHAPE UZ KOJI IDE
+		//   //    }
+		//   //    else
+		//   //    {
+		//   //        transformGrupText.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1));
+		//   //    }
+		//   //}
+
+
+		//   //if ((shape.transform.scale_0 != 0) || (shape.transform.scale_1 != 0))
+		//   //    transformGrupText.Children.Add(new ScaleTransform(shape.transform.scale_0, shape.transform.scale_1));
+
+		//   //if (transformGrupText.Children.Count > 0)//if there is more than one transformation
+		//   //{
+		//   //    textBlock.RenderTransform = transformGrupText;
+		//   //}
+		//   #endregion
+
+		//   pageImageContainer.Children.Add(textBlock);
+
+		//   //if (imaRotate == false)
+		//   //{
+		//   //    textBlock.SetValue(Canvas.LeftProperty, shape._text.x);
+		//   //    textBlock.SetValue(Canvas.TopProperty, shape._text.y - 5);//Note to my self: Privremeno resenje sa "-5" je stavljeno da se ne ispisuje tekst preko symbola, u stvarnosti to je reseno nekim alaymentom sto trebe detaljnije pogledati
+		//   //}
+		//   //else//if there is rotate than we put text block on the same coordinates as syboml (X,Y properties) and ignore translation  
+		//   //{
+		//   textBlock.SetValue(Canvas.LeftProperty, shape._text.x);
+		//   textBlock.SetValue(Canvas.TopProperty, shape._text.y);
+		//   //}
+		//}
+		#endregion
+
+		public void DrawText(Canvas pageImageContainer, SVGShape shape, double X, double Y)
+		{
+			TextBlock textBlock = new TextBlock();
+			//Font adjustment           
+			//Note to my self: Ovde ima mesta za dalja fina podesavnja
+			if (shape._text.style.font.family != "")
+			{
+				textBlock.FontFamily = new FontFamily(shape._text.style.font.family);
+			}
+			if (shape._text.style.font.size != "")                                              //set the font size only if there are any value defined
+			{
+				if (shape._text.style.font.size.Contains("em"))
+				{//returns true if "em" accurs
+					textBlock.FontSize = textBlock.FontSize * Convert.ToDouble(shape._text.style.font.size.Replace("em", ""));//size string is given in format(0.499em).EM means "emphemeral unit" which is relative to the current font size.For example, if the current font size was set to 16px, then the bottom padding would be set to 160px.
+				}
+				else
+				{//if size valu is given without in normal format without em                
+					textBlock.FontSize = Convert.ToDouble(shape._text.style.font.size);
+				}
+			}
+
+            if (shape.typeOfShape == SVGSHAPETYPE.SVG_UNKNOWN)
+            {
+                if (shape._text.style.fillColor == "#FF000000")
+                {
+                    textBlock.Foreground = Brushes.White;
+                }
+                else
+                {
+                    textBlock.Foreground = (Brush)colorConverter.ConvertFromString(shape._text.style.fillColor);
+                }
+            }
+			else if (shape.colorCode != "")
+			{
+			   textBlock.Foreground = (Brush)colorConverter.ConvertFromString(shape.colorCode.ToString());
+			}
+            else
+            {
+                textBlock.Foreground = (Brush)colorConverter.ConvertFromString(Brushes.White.ToString());
+            }
+
+
+			bool imaRotate = false;
+			
+			TransformGroup transformGrupText = new TransformGroup();
+
+			if (shape.transform.rotate != 0)
+			{
+				transformGrupText.Children.Add(new RotateTransform(shape.transform.rotate));
+				imaRotate = true;
+			}
+
+			if ((shape.transform.translate_0 != 0) || (shape.transform.translate_1 != 0))
+			{
+				if (imaRotate)
+				{
+	                //
+				}
+				else
+				{
+					transformGrupText.Children.Add(new TranslateTransform(shape.transform.translate_0, shape.transform.translate_1));
+				}
+			}
+
+
+			if ((shape.transform.scale_0 != 0) || (shape.transform.scale_1 != 0))
+				transformGrupText.Children.Add(new ScaleTransform(shape.transform.scale_0, shape.transform.scale_1));
+
+			if (transformGrupText.Children.Count > 0)//if there is more than one transformation
+			{
+				textBlock.RenderTransform = transformGrupText;
+			}
+			textBlock.Text = shape._text.text;
+			pageImageContainer.Children.Add(textBlock);
+
+			if (imaRotate == false)
+			{
+				textBlock.SetValue(Canvas.LeftProperty, shape._text.x);
+
+				textBlock.SetValue(Canvas.TopProperty, shape._text.y -10);
+
+			}
+			else//if there is rotate than we put text block on the same coordinates as syboml (X,Y properties) and ignore translation  
+			{
+				textBlock.SetValue(Canvas.LeftProperty, X);
+				textBlock.SetValue(Canvas.TopProperty, Y );
+			}
+
+            //Generic nameing of images (like ShapeNo1)
+            textBlock.Name = "ShapeNo" + shape.mID.ToString();
+            //Adding exeption handler function on MouseClick
+            // textBlock.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseLeftButtonDown);
+            textBlock.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(pathShapeImage_MouseRightButtonDown);
+		}
+
+		#region Old Methods
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:LineWeightChange || Autor:Ognjen Vulic  || Date:23.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// LineWeightChange
+		/// </summary>
+		/// <param name="pageImageContainer"></param>
+		/// <param name="new_value"></param>
+		//public void LineWeightChange(Canvas pageImageContainer, double new_value)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+		//    globalLineWeightMultilayer = new_value;
+		//    DrawPage(pageImageContainer, globalLineWeightMultilayer);
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:PressureColorChange || Autor:Ognjen Vulic  || Date:26.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// PressureColorChange method
+		/// </summary>
+		/// <param name="pageImageContainer"></param>
+		/// <param name="new_value"></param>
+		//public void PressureColorChange(Canvas pageImageContainer, Brush new_value)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+		//    pressureColor = new_value;
+		//    DrowPage(pageImageContainer, globalLineWeightMultilayer);
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:FlowColorChange || Autor:Ognjen Vulic  || Date:26.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// FlowColorChange
+		/// </summary>
+		/// <param name="pageImageContainer"></param>
+		/// <param name="new_value"></param>
+		//public void FlowColorChange(Canvas pageImageContainer, Brush new_value)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+		//    FlowColor = new_value;
+		//    DrowPage(pageImageContainer, globalLineWeightMultilayer);
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:PressureSimulation || Autor:Ognjen Vulic  || Date:19.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// PressureSimulation metod simulating the pressure in system
+		/// </summary>
+		/// <param name="pageSVG"></param>
+		/// <param name="pageImageContainer">Contanier for drawing, in this case Canvas</param>
+		//public void PressureSimulation(Canvas pageImageContainer)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+
+		//    //initialization
+		//    Flow = false;
+		//    pressure = true;
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        s.visited = false;
+		//        if (s.shapeType != ElemType.SHAPE_ACTIV)//aktivni elemnt moze biti otvoren i zatvoren a svi ostali su inicijalno prazni pa naknadno se odredjuje da li su pressure ili flow
+		//            s.shapeState = ElemState.STATE_OPEN;
+		//    }
+		//    //looking for input element and starting from it
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        if (s.shapeType == ElemType.SHAPE_INPUT)
+		//            ShowPressure(s, true);
+		//    }
+
+		//    pageImageContainer.Children.Clear();//clera canvas
+
+		//    DrowPage(pageImageContainer, globalLineWeightMultilayer + 1);//drow picture with new states
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:ShowPressure || Autor:Ognjen Vulic  || Date:19.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// ShowPressure metod is used for requrzion in pressure simulation
+		/// </summary>
+		/// <param name="shapeForPress">Shape that is curently fokused</param>
+		/// <param name="pageSVG"></param>
+		/// <param name="input">presure or no presure on imput of curently fokused shape</param>
+		/// <returns></returns>
+		//public bool ShowPressure(SVGShape shapeForPress, bool input)
+		//{
+		//    bool output;
+
+		//    if (input == false)//nema pritiska
+		//    {
+		//        return false;
+		//    }
+
+		//    if (shapeForPress.visited == true)//vec odredjeno stanje
+		//    {
+		//        return false;
+		//    }
+
+		//    if (shapeForPress.shapeType == ElemType.SHAPE_ACTIV)
+		//    {
+		//        if (shapeForPress.shapeState == ElemState.STATE_OPEN)
+		//            output = true;
+		//        else//only other case is shapeState == ElemState.STATE_CLOSED
+		//            output = false;
+		//    }
+		//    else //ElemType[INPUT,OUTPUT,PASSIVE,MULTIELENT]
+		//    {
+		//        shapeForPress.shapeState = ElemState.STATE_PRESSURE;
+		//        output = true;
+		//    }
+
+		//    shapeForPress.visited = true;//mark as visited
+
+		//    foreach (int connectedShapesIDs in shapeForPress.connectedToList)
+		//    {
+		//        ShowPressure(pageSVG.shape_list[connectedShapesIDs], output);
+		//    }
+
+		//    return true;
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:FlowSimulation || Autor:Ognjen Vulic  || Date:19.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// FlowSimulation metod simulate the Flow in system
+		/// </summary>
+		/// <param name="pageSVG"></param>
+		/// <param name="pageImageContainer">Contanier for drawing, in this case Canvas</param>
+		//public void FlowSimulation(Canvas pageImageContainer)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+		//    //PRESSURE SIMULATION FIRST (WITHOUT DRAWING)
+		//    //inicialization
+		//    pressure = false;
+		//    Flow = true;
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        s.visited = false;
+		//        if (s.shapeType != ElemType.SHAPE_ACTIV)//aktivni elemnt moze biti otvoren i zatvoren a svi ostali su inicijalno prazni pa naknadno se odredjuje da li su pressure ili flow
+		//            s.shapeState = ElemState.STATE_OPEN;
+		//    }
+		//    ////looking for input element and starting from it
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        if (s.shapeType == ElemType.SHAPE_INPUT)
+		//            ShowPressure(s, true);
+		//    }
+
+		//    //FLOW SIMULATION
+		//    //inicialization
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        s.visited = false;
+		//    }
+
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        if (s.shapeType == ElemType.SHAPE_INPUT)// && (s.visited == false))
+		//            ShowFlow(s);
+		//    }
+
+
+		//    pageImageContainer.Children.Clear();//clera canvas
+
+		//    DrowPage(pageImageContainer, globalLineWeightMultilayer + 1);//drow picture with new states
+
+		//}
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Name:ShowFlow || Autor:Ognjen Vulic  || Date:30.06.2009              
+		/*----------------------------------------------------------------------------------------------------------*/
+		/// <summary>
+		/// ShowFlow metod is used for requrzion in flow simulation
+		/// </summary>
+		/// <param name="shapeForFlow"></param>
+		/// <param name="pageSVG"></param>
+		/// <returns></returns>
+		//public bool ShowFlow(SVGShape shapeForFlow)
+		//{
+		//    bool output = false;
+
+		//    if (shapeForFlow.shapeState == ElemState.STATE_FLOW)
+		//    {
+		//        return true;
+		//    }
+
+		//    switch (shapeForFlow.shapeType)
+		//    {
+		//        case ElemType.SHAPE_OUTPUT:
+		//            shapeForFlow.shapeState = ElemState.STATE_FLOW;
+		//            return true;
+		//        case ElemType.SHAPE_ACTIV:
+		//            if (shapeForFlow.shapeState == ElemState.STATE_CLOSE)
+		//            {
+		//                return false;
+		//            }
+		//            shapeForFlow.visited = true;
+		//            foreach (int connectedShapesIDs in shapeForFlow.connectedToList)
+		//            {
+		//                if ((pageSVG.shape_list[connectedShapesIDs].visited == false) && (ShowFlow(pageSVG.shape_list[connectedShapesIDs])))
+		//                {
+		//                    output = true;
+		//                }
+		//            }
+		//            shapeForFlow.visited = false;
+		//            return output;
+		//        case ElemType.SHAPE_INPUT:
+		//        case ElemType.SHAPE_MULTIELEMENT:
+		//        case ElemType.SHAPE_PASIV:
+		//            shapeForFlow.visited = true;
+
+		//            foreach (int connectedShapesIDs in shapeForFlow.connectedToList)
+		//            {
+		//                if ((pageSVG.shape_list[connectedShapesIDs].visited == false) && (ShowFlow(pageSVG.shape_list[connectedShapesIDs])))
+		//                {
+		//                    output = true;
+		//                }
+		//            }
+
+		//            shapeForFlow.visited = false;
+
+
+		//            if (output)
+		//            {
+		//                shapeForFlow.shapeState = ElemState.STATE_FLOW;
+		//            }
+		//            return output;
+		//        default:
+		//            return false;
+		//    }
+
+		//    // return true;
+
+		//}
+
+		///*----------------------------------------------------------------------------------------------------------*/
+		///* Name:STOPSimulation || Autor:Ognjen Vulic  || Date:30.06.2009              
+		///*----------------------------------------------------------------------------------------------------------*/
+		///// <summary>
+		///// STOPSimulation 
+		///// </summary>
+		///// <param name="pageImageContainer"></param>
+		//public void STOPSimulation(Canvas pageImageContainer)
+		//{
+		//    if (pageSVG == null)
+		//    {
+		//        MessageBox.Show("No SHEME Loaded !!!");
+		//        return;
+		//    }
+
+		//    //initialization
+		//    Flow = false;
+		//    pressure = false;
+		//    foreach (SVGShape s in pageSVG.shape_list)
+		//    {
+		//        if (s.shapeType != ElemType.SHAPE_ACTIV)//aktivni elemnt moze biti otvoren i zatvoren a svi ostali su inicijalno prazni pa naknadno se odredjuje da li su pressure ili flow
+		//            s.shapeState = ElemState.STATE_EMPTY;
+		//    }
+
+		//    DrowPage(pageImageContainer, globalLineWeightMultilayer);
+		//}
+
+		///*----------------------------------------------------------------------------------------------------------*/
+		///* Name:FillLayerChackBoxes || Autor:Ognjen Vulic  || Date:30.06.2009              
+		///*----------------------------------------------------------------------------------------------------------*/
+		///// <summary>
+		///// FillLayerChackBoxes method fils StackPanel component with ChackBox object representing Layer's
+		///// </summary>
+		///// <param name="layerChackBoxStackPanel">Stack Panel</param>
+		//public void FillLayerChackBoxes(StackPanel layerChackBoxStackPanel)
+		//{
+		//    layerChackBoxStackPanel.Children.Clear();
+		//    foreach (SVGLayer layer in pageSVG.layer_list)
+		//    {
+		//        CheckBox newChackBox = new CheckBox();
+		//        newChackBox.Content = layer.layer_index.ToString() + "." + layer.layer_name;
+
+		//        newChackBox.HorizontalAlignment = HorizontalAlignment.Center;
+		//        newChackBox.VerticalAlignment = VerticalAlignment.Center;
+
+		//        layerChackBoxStackPanel.Children.Add(newChackBox);
+		//        newChackBox.Checked += new RoutedEventHandler(newChackBox_Click);
+		//        newChackBox.Unchecked += new RoutedEventHandler(newChackBox_Click);
+		//    }
+
+		//}
+		#endregion
+
+		/*----------------------------------------------------------------------------------------------------------*/
+		/* Event Function
+		/*----------------------------------------------------------------------------------------------------------*/
+
+
+		void pathShapeImage_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+            int mIDofShape=-1;
+            if(sender is Image)
+            {
+                 mIDofShape = Convert.ToInt32(((Image)sender).Name.Split('o')[1]);//String that is splited looks like "ShapeNo22",so after spliting is "ShapeN" and "22" and the number is actaualy mID of selected shape
+            }
+            else if (sender is TextBlock)
+            {
+                mIDofShape = Convert.ToInt32(((TextBlock)sender).Name.Split('o')[1]);
+            }
+
+            OnSvgShapeRightClicked(EventArgs.Empty, mIDofShape);
+
+            //SVGShape shape = null;
+            //foreach (SVGShape shape_found in pageSVG.shape_list)
+            //{
+            //    if (shape_found.mID == mIDofShape)//the selected one
+            //    {
+            //        shape = shape_found;
+            //        break;
+            //    }
+            //}
+
+            //if (shape.cp.pvid != "")
+            //{
+            //     OnSvgShapeRightClicked(EventArgs.Empty, shape.cp.pvid);
+            //}          
+  		}
+
+		void pathShapeImage_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+
+			#region old code
+			//RichTextBox richTextBox1 = new RichTextBox();
+			//richTextBox1.Document.Blocks.Clear();
+			//int mIDofShape = Convert.ToInt32(((Image)sender).Name.Split('o')[1]);//String that is splited looks like "ShapeNo22",so after spliting is "ShapeN" and "22" and the number is actaualy mID of selected shape
+
+			//SVGShape shape = null;
+			//foreach (SVGShape shape_found in pageSVG.shape_list)
+			//{
+			//    if (shape_found.mID == mIDofShape)//the selected one
+			//    {
+			//        shape = shape_found;
+			//        break;
+			//    }
+			//}
+
+			//richTextBox1.AppendText("\rShape mID: " + shape.mID.ToString());
+			//richTextBox1.AppendText("\rShape shapeState: " + shape.shapeState.ToString());
+			//richTextBox1.AppendText("\rShape shapeType: " + shape.shapeType.ToString());
+			//richTextBox1.AppendText("\rShape _text: " + shape._text.text);
+			//richTextBox1.AppendText("\rShape typeOfShape: " + shape.typeOfShape.ToString());
+			//richTextBox1.AppendText("\rShape active: " + shape.active.ToString());
+			//richTextBox1.AppendText("\rShape visited: " + shape.visited.ToString());
+			//richTextBox1.AppendText("\rShape layer: " + shape.layer.ToString());
+			//richTextBox1.AppendText("\r---Costum Properties---");
+			//richTextBox1.AppendText("\rShapeCP type: " + shape.cp.type.ToString());
+			//richTextBox1.AppendText("\rShapeCP symbol_namber: " + shape.cp.symbol_number.ToString());
+			//richTextBox1.AppendText("\rShapeCP master_name: " + shape.cp.symbol_name);
+			//richTextBox1.AppendText("\rShapeCP time_create: " + shape.cp.time_create);
+			//richTextBox1.AppendText("\rShapeCP put_number: " + shape.cp.put_number);
+			//richTextBox1.AppendText("\rShapeCP put_color: " + shape.cp.put_color);
+			//richTextBox1.AppendText("\rShapeCP symbol_legend: " + shape.cp.symbol_legend);
+			//richTextBox1.AppendText("\rShapeCP symbol_name: " + shape.cp.symbol_name);
+			//richTextBox1.AppendText("\rShapeCP connectionNum: " + shape.cp.connectionNum.ToString());
+			//richTextBox1.AppendText("\rShapeCP MOIBloksema: " + shape.cp.MOIBloksema.ToString());
+			//richTextBox1.AppendText("\rShapeCP NumOfInputs: " + shape.cp.NumOfInputs.ToString());
+			//richTextBox1.AppendText("\rShapeCP NumOfOutputs: " + shape.cp.NumOfOutputs.ToString());
+
+			////// create POPUP window
+			//var oWindow = new Window();
+
+			//////setting up its starting position
+			//oWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+			////// we can make it available or not in taskbar
+			//oWindow.ShowInTaskbar = false;
+
+			//oWindow.Width = 250;
+			//oWindow.Height = 350;
+			//oWindow.ResizeMode = ResizeMode.CanResizeWithGrip;
+			//oWindow.Title = "Shape " + mIDofShape.ToString();
+
+			//oWindow.Content = richTextBox1;
+			//oWindow.Opacity = 10;
+
+			//oWindow.ShowDialog();
+
+			#endregion
+
+			int mIDofShape = Convert.ToInt32(((Image)sender).Name.Split('o')[1]);//String that is splited looks like "ShapeNo22",so after spliting is "ShapeN" and "22" and the number is actaualy mID of selected shape
+
+			SVGShape shape = null;
+			foreach (SVGShape shape_found in svgPage.shape_list)
+			{
+				if (shape_found.mID == mIDofShape)//the selected one
+				{
+					shape = shape_found;
+					break;
+				}
+			}
+
+			if (shape.typeOfShape == SVGSHAPETYPE.SVG_BUTTON)
+			{
+				if (shape.cp.svgLink != "")
+				{
+					OnSvgShapeClicked(EventArgs.Empty, shape.mID);
+				}
+				else
+				{
+					MessageBox.Show("!!!");
+				}
+			}
+
+			if (shape.typeOfShape == SVGSHAPETYPE.SVG_SYMBOL)
+			{
+				if (shape.cp.pvid != "")
+				{
+                    OnSvgShapeClicked(EventArgs.Empty, shape.mID);
+				}
+				else
+				{
+					MessageBox.Show("!!!");
+				}
+			}
+		}
+
+		public delegate void SvgShapeClickedEventHandler(object sender, EventArgs e, int mID);
+
+        public event SvgShapeClickedEventHandler SvgShapeClicked;
+
+		protected virtual void OnSvgShapeClicked(EventArgs e, int mID)
+		{
+			if (SvgShapeClicked != null)
+                SvgShapeClicked(this, e, mID);
+		}
+
+        public delegate void SvgShapeRightClickedEventHandler(object sender, EventArgs e, int mID);
+
+        public event SvgShapeRightClickedEventHandler SvgShapeRightClicked;
+
+        protected virtual void OnSvgShapeRightClicked(EventArgs e, int mID)
+        {
+            if (SvgShapeRightClicked != null)
+                SvgShapeRightClicked(this, e, mID);
+        }
+	}
+}
