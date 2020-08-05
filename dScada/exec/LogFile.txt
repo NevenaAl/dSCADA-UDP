@@ -14,3 +14,14 @@
 <07/29/20 17:13:18> Bind socket problem! Error code: 10048
 <07/29/20 17:28:55> Client ioctlsocket read problem! Error code: 10093
 <08/01/20 18:56:58> Client ioctlsocket read problem! Error code: 10038
+<08/02/20 21:46:59> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 20:31:50> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 20:57:13> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 20:57:42> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 20:58:47> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 20:59:37> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 21:23:26> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 21:26:03> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 21:30:14> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 21:34:33> Client ioctlsocket read problem! Error code: 10038
+<08/03/20 22:01:15> Client ioctlsocket read problem! Error code: 10038

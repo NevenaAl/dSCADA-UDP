@@ -4,15 +4,15 @@
 winexe
 C#
 .cs
-D:\Predavanja\SWKO\2015\dScada-TCP\dClient\WpfDSCADA\obj\x86\Debug\
+D:\Desktop\dSCADA-UDP\dScada\dClient\WpfDSCADA\obj\x86\Debug\
 WpfDSCADA
 none
 false
 DEBUG;TRACE
-D:\Predavanja\SWKO\2015\dScada-TCP\dClient\WpfDSCADA\App.xaml
+D:\Desktop\dSCADA-UDP\dScada\dClient\WpfDSCADA\App.xaml
 4-1208064567
 
-201994788592
+20928589522
 13-1012886045
 GraphicWindow.xaml;MainWindow.xaml;SendCommandDialog.xaml;SvgShapeInfo.xaml;
 

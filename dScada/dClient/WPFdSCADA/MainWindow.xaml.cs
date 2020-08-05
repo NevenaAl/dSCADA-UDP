@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System.Media;
 using System.Text;
+using System.Net;
 
 namespace WpfDSCADA
 {
@@ -182,7 +183,7 @@ namespace WpfDSCADA
                 if (ClientSocket == null)
                 {
                     // napravi socket za vezu sa AUB-om
-                    ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+                    ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
                     {
                         //NoDelay = true,
                         //SendBufferSize = 1
@@ -194,13 +195,17 @@ namespace WpfDSCADA
                     // pokusaj konekciju na AUB, na prvu ili drugu host masinu
                     try
                     {
-                        ClientSocket.Connect("localhost", DEFAULT_AUB_PORT);
+                        ClientSocket.Connect("239.255.10.10", DEFAULT_AUB_PORT);
+                        //ClientSocket.Connect("localhost", DEFAULT_AUB_PORT);
                         // uspesna konekcija na Host
                         ClientConnected = true;
                         // izbrisi sve iz listi 
                         Dispatcher.Invoke(DispatcherPriority.Normal, new DelegateClearAllCollections(clearAllCollections));
                         // oznaci konekciju promenom ikonice
                         Dispatcher.Invoke(new DelegateUpdateIcon(updateIcon));
+
+                        SendToHost("connected");
+                        
                     }
                     catch (ArgumentNullException ane)
                     {
@@ -223,12 +228,30 @@ namespace WpfDSCADA
 
                 if (ClientConnected)
                 {
-                    int bcnt = 0;                           // byte count
+                    /*while (ClientSocket != null)
+                    {
+                        try
+                        {
+                            int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+                    }*/
+                    
+                    IPEndPoint receivePoint = new IPEndPoint(IPAddress.Any, 9995);
+
+                    EndPoint tempReceivePoint = (EndPoint)receivePoint;
+                    int rsts2 = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None,ref tempReceivePoint);
+                    
+                    /*int bcnt = 0;                           // byte count
                     while (ClientSocket != null && bcnt < MSG_MAX_LEN)
                     {
                         try
                         {
                             int rsts = ClientSocket.Receive(RxBuff, bcnt, 1, SocketFlags.None);
+
                             if (rsts <= 0)
                             {
                                 // konekcija je prekinuta
@@ -265,7 +288,7 @@ namespace WpfDSCADA
                                     break;
                             }
                         }
-                    }
+                    }*/
                 }
                 //Application.Current.Dispatcher.Invoke(new Action(() => printEvent(ClientSocket.Connected.ToString())));
                 //Thread.Sleep(500);

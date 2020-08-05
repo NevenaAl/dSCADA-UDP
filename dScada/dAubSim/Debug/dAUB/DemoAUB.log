@@ -1,0 +1,34 @@
+﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  StdAfx.cpp
+cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  Ioascii.cpp
+  Globals.cpp
+  modbus.cpp
+  ApplicationSpecific.cpp
+  UdpPort.cpp
+  UartPort.cpp
+  Timers.cpp
+  TcpPort.cpp
+  pvidstr.cpp
+  ReadConfigFile.cpp
+  Processing.cpp
+  Conversion.cpp
+  PipeFun.cpp
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(79,7): warning C4101: 'from_len': unreferenced local variable
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(78,22): warning C4101: 'from_addr': unreferenced local variable
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(69,8): warning C4101: 'recv_str': unreferenced local variable
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(70,7): warning C4101: 'recv_len': unreferenced local variable
+  Loger.cpp
+  HashFun.cpp
+  Event.cpp
+  DemoAUBDlg.cpp
+  DemoAUB.cpp
+  dAUB.cpp
+  ComPort.cpp
+  Generating Code...
+  Compiling...
+  ComFun.cpp
+  AUBTime.cpp
+  Generating Code...
+  DemoAUB.vcxproj -> D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dAUB\dAUB.exe
+          1 file(s) copied.

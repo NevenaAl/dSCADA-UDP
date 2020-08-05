@@ -1,0 +1,2 @@
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dSim\dSim.exe
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dSim\dSim.pdb

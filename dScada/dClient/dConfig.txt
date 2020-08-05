@@ -1,0 +1,4 @@
+AubCfg AubCfgtest.txt
+RtuCfg RtuCfg.txt
+SvgFile dSchema.svg
+Station TEST

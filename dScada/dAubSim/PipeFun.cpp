@@ -2,6 +2,22 @@
 
 void ProcessCmd(void);
 
+#include <WinSock2.h> 
+#define _WINSOCK_DEPCRECATED_NO_WARNINGS
+#include <sys/types.h> /* for type definitions */
+#include <winsock.h> //umjeso sys socketa i arpa
+#include <stdio.h>/* for printf() and fprintf() */
+#include <stdlib.h>/* for atoi() */
+#include <string.h>/* for strlen() */
+
+#define MAX_LEN 1024 /* maximum receive string size */
+#define MIN_PORT 1024 /* minimum port allowed */
+#define  MAX_PORT 65535 /* maximum port allowed */
+#define IP_ADD_MEMBERSHIP         12 
+#define IP_DROP_MEMBERSHIP        13
+
+
+
 //static HANDLE AubPipeIN, AubPipeOUT;
 //static HANDLE spipe_mutex;
 //static bool Client.Connected = FALSE;
@@ -9,10 +25,12 @@ void ProcessCmd(void);
 #define DEFAULT_CLIENT_PORT 9995
 #define CMSG_MAX_SLEN 1500			// Client Send Msg
 #define CMSG_MAX_RLEN 250			// Client Recv Msg
+#define MAX_CLIENT_NUMBER 10        // Max number of connected clients
 
 typedef struct
 {								// Client TCP Pipe
 	SOCKET sockfd;
+	struct sockaddr_in address;
 	char sMsg[CMSG_MAX_SLEN];		// bafer za slanje poruke
 	char rMsg[CMSG_MAX_RLEN];
 	bool Connected;
@@ -20,7 +38,14 @@ typedef struct
 	int cRead;
 } CPIPE;
 
+// struct ip_mreq mc_req; /* multicast request structure */
+struct ip_mreq {
+	struct in_addr imr_multiaddr; /* Group multicast address */
+	struct in_addr imr_interface; /* Local interface address */
+}mc_req;
+
 static SOCKET socklsn;
+//static CPIPE Client[MAX_CLIENT_NUMBER];
 static CPIPE Client;
 //int NoClients = 0;
 
@@ -44,51 +69,71 @@ bool get_flag(char *str)
 }
 
 static bool pipe_open = false;
-int OpenPipe(void)
-{
-	// Stvaramo listen uticnicu za TCP servera 
-	socklsn = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (SOCKET_ERROR == socklsn)
-	{
-		PutLogMessage("Create socket problem! Error code: %d", WSAGetLastError());
-		return NOK;
-	}
+int OpenPipe(void) {
 
-	// Set the socket I/O mode: non-blocking; 
-	int iMode = 1;
-	if (ioctlsocket(socklsn, FIONBIO, (u_long FAR*)&iMode))
-	{
-		PutLogMessage("Set socket IO mode problem! Error code: %d", WSAGetLastError());
-		closesocket(socklsn);
-		return NOK;
-	}
 
-	// identifikacija lokalne masine, priprema za bind
-	static SOCKADDR_IN server;
+		//int sock;  /* socket descriptor */
+		int flag_on = 1;  /* socket option flag */
+		struct sockaddr_in mc_addr;  /* socket address structure */
+		
+		
+		char* mc_addr_str; /* multicast IP address */
+		short mc_port; /* multicast port */
+		
+		WSADATA wsaData;
+		/* Load Winsock 2.0 DLL */
+		if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0) {
+			fprintf(stderr, "WSAStartup() failed");
+			return NOK;
+		}
 
-	memset(&server, 0, sizeof(server));
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+		mc_addr_str = "239.255.10.10"; //multicast ip address
+		mc_port = 9995;                //multicast port number
 
-	server.sin_port = htons(DEFAULT_CLIENT_PORT);
-	if (bind(socklsn, (sockaddr*)&server, sizeof(server)))
-	{
-		PutLogMessage("Bind socket problem! Error code: %d", WSAGetLastError());
-		closesocket(socklsn);
-		return NOK;
-	}
+									 /* validate the port range */
+		if ((mc_port < MIN_PORT) || (mc_port > MAX_PORT)) {
+			fprintf(stderr, "Invalid port number argument %d.\n", mc_port);
+			fprintf(stderr, "Valid range is between %d and %d.\n", MIN_PORT, MAX_PORT);
+			return NOK;
+		}
 
-	// postavi listen mode
-	if (listen(socklsn, 1) == SOCKET_ERROR)
-	{
-		PutLogMessage("Listen socket problem! Error code: %d", WSAGetLastError());
-		closesocket(socklsn);
-		return NOK;
-	}
+		/* create socket to join multicast group on */
+		if ((socklsn = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+			perror("socket() failed");
+			return NOK;
+		}
 
-	memset(&Client, 0, sizeof(Client));
-	pipe_open = true;
-	return OK;
+		/* set reuse port to on to allow multiple binds per host */
+		if ((setsockopt(socklsn, SOL_SOCKET, SO_REUSEADDR, (char*)&flag_on, sizeof(flag_on))) < 0) {
+			perror("setsockopt() failed");
+			return NOK;
+		}
+
+		/* construct a multicast address structure */
+		memset(&mc_addr, 0, sizeof(mc_addr));
+		mc_addr.sin_family = AF_INET;
+		mc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		mc_addr.sin_port = htons(mc_port);
+
+		/* bind multicast address to socket */
+		if ((bind(socklsn, (struct sockaddr*) & mc_addr, sizeof(mc_addr))) < 0) {
+			perror("bind() failed");
+			return NOK;
+		}
+
+		/* construct an IGMP join request structure */
+		mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
+		mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+
+		/* send an ADD MEMBERSHIP message via setsockopt */
+		if ((setsockopt(socklsn, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
+			perror("setsockopt() failed");
+			return NOK;
+		}
+
+		memset(&Client, 0, sizeof(Client));
+		pipe_open = true;
+		return OK;
 }
 
 void DisconnectClient(void)
@@ -106,9 +151,13 @@ void ClosePipe(void)
 	if (pipe_open)
 	{
 		closesocket(socklsn);
+		if ((setsockopt(socklsn, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
+			perror("setsockopt() failed");
+			exit(1);
+		}
 		if (Client.Connected)
 		{
-			closesocket(Client.sockfd);
+			//closesocket(Client.sockfd);
 			memset(&Client, 0, sizeof(CPIPE));
 		}
 	}
@@ -117,31 +166,40 @@ void ClosePipe(void)
 
 int WaitForClient(void)
 {
-	fd_set wfds;
-	struct timeval timeout = { 1, 0 };  // u sec
-	wfds.fd_count = 1;
-	wfds.fd_array[0] = socklsn;
-	// proveri sa select je li accept pending (da li se ko povezuje)
-	while (select(1, &wfds, NULL, NULL, &timeout))
-	{
-		// prihvati i sacuvaj svaku konekciju
-		SOCKET socktmp = accept(socklsn, NULL, NULL);
-		if (socktmp != INVALID_SOCKET)
+	char recv_str[MAX_LEN + 1]; /* buffer to receive string */
+	memset(&Client.address, 0, sizeof(Client.address));
+	int recv_len; /* length of string received */
+	struct sockaddr_in from_addr;  /* packet source */
+	int from_len;  /* source addr length */
+	for (; ;) {
+		memset(recv_str, 0, sizeof(recv_str));
+		from_len = sizeof(from_addr);
+		memset(&from_addr, 0, from_len);
+
+		/* block waiting to receive a packet */
+		if ((recv_len = recvfrom(socklsn, recv_str, MAX_LEN, 0, (struct sockaddr*) & from_addr, &from_len)) < 0) {
+			perror("recvfrom() failed");
+			return NOK;
+		}
+
+		/* output received string */
+		//printf("Received %d bytes from %s: ", recv_len, inet_ntoa(from_addr.sin_addr));
+		//printf("%s", recv_str);
+		if (!Client.Connected)
 		{
-			if (!Client.Connected)
-			{
-				Client.sockfd = socktmp;
-				Client.Connected = true;
-				Client.cRead = 0;
-				InitClient();
-				PutLocEvent(NULL, "Station %s: Client connected!", StnCfg.StaName);
-				break;
-			}
+			//Client.sockfd = from_addr;
+			Client.address =  from_addr;
+			Client.Connected = true;
+			Client.cRead = 0;
+			InitClient();
+			PutLocEvent(NULL, "Station %s: Client connected!", StnCfg.StaName);
+
 		}
 	}
+	
+	
 	return OK;
 }
-
 
 
 // Primi poruke (commands) koje salje klijent 
@@ -205,22 +263,19 @@ void WaitForCmd(void)
 
 // slanje stringa na PipeOUT
 // vraca 0/1 da bi se chg mogao direktno azurirati
-int SendToPipe(char *msg)
-{
-	int ret = OK;
+int SendToPipe(char* msg) {
 	if (Client.Connected)
 	{
-		int msg_len = strlen(msg);
-		int no_sent = send(Client.sockfd, msg, msg_len, 0);
-		if (no_sent != msg_len)
-		{
+		int length, msg_len;
+		length = sizeof(Client.address);
+		msg_len = strlen(msg);
+		if ((sendto(socklsn, msg, msg_len, 0, (const struct sockaddr*)&Client.address, length)) != msg_len) {
+			perror("sendto() sent incorrect number of bytes");
 			DisconnectClient();
-			ret = NOK;
+			return NOK;
 		}
-		// zapis komunikacije u LogFile
-		//PutLogMsg( msg );
 	}
-	return ret;
+	return OK;
 }
 
 

@@ -1,0 +1,2 @@
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dAUB\dAUB.exe
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dAUB\dAUB.pdb
