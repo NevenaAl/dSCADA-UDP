@@ -1,18 +1,20 @@
+#pragma once
 #include "stdafx.h"
 
 void ProcessCmd(void);
 
-#include <WinSock2.h> 
-#define _WINSOCK_DEPCRECATED_NO_WARNINGS
-#include <sys/types.h> /* for type definitions */
-#include <winsock.h> //umjeso sys socketa i arpa
-#include <stdio.h>/* for printf() and fprintf() */
-#include <stdlib.h>/* for atoi() */
-#include <string.h>/* for strlen() */
+//#include <WinSock2.h> 
+//#define _WINSOCK_DEPCRECATED_NO_WARNINGS
+//#include <sys/types.h> /* for type definitions */
+//#include <winsock.h> //umjeso sys socketa i arpa
+//#include <stdio.h>/* for printf() and fprintf() */
+//#include <stdlib.h>/* for atoi() */
+//#include <string.h>/* for strlen() */
 
 #define MAX_LEN 1024 /* maximum receive string size */
 #define MIN_PORT 1024 /* minimum port allowed */
 #define  MAX_PORT 65535 /* maximum port allowed */
+#define SERVER_SLEEP_TIME 50
 #define IP_ADD_MEMBERSHIP         12 
 #define IP_DROP_MEMBERSHIP        13
 
@@ -38,8 +40,8 @@ typedef struct
 	int cRead;
 } CPIPE;
 
-// struct ip_mreq mc_req; /* multicast request structure */
-struct ip_mreq {
+//  multicast request structure */
+struct ip_mreq2 {
 	struct in_addr imr_multiaddr; /* Group multicast address */
 	struct in_addr imr_interface; /* Local interface address */
 }mc_req;
@@ -87,8 +89,8 @@ int OpenPipe(void) {
 			return NOK;
 		}
 
-		mc_addr_str = "239.255.10.10"; //multicast ip address
-		mc_port = 9995;                //multicast port number
+		mc_addr_str = "239.255.50.50"; //multicast ip address
+		mc_port = 8080;                //multicast port number
 
 									 /* validate the port range */
 		if ((mc_port < MIN_PORT) || (mc_port > MAX_PORT)) {
@@ -104,32 +106,41 @@ int OpenPipe(void) {
 		}
 
 		/* set reuse port to on to allow multiple binds per host */
-		if ((setsockopt(socklsn, SOL_SOCKET, SO_REUSEADDR, (char*)&flag_on, sizeof(flag_on))) < 0) {
+		/*if ((setsockopt(socklsn, SOL_SOCKET, SO_REUSEADDR, (char*)&flag_on, sizeof(flag_on))) < 0) {
 			perror("setsockopt() failed");
 			return NOK;
-		}
+		}*/
 
 		/* construct a multicast address structure */
 		memset(&mc_addr, 0, sizeof(mc_addr));
 		mc_addr.sin_family = AF_INET;
 		mc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		mc_addr.sin_port = htons(mc_port);
+		mc_addr.sin_port = htons((u_short)mc_port);
 
 		/* bind multicast address to socket */
 		if ((bind(socklsn, (struct sockaddr*) & mc_addr, sizeof(mc_addr))) < 0) {
 			perror("bind() failed");
 			return NOK;
 		}
+		unsigned long int nonBlockingMode = 1;
+		int iResult = ioctlsocket(socklsn, FIONBIO, &nonBlockingMode);
+
+		if (iResult == SOCKET_ERROR)
+		{
+			printf("ioctlsocket failed with error: %ld\n", WSAGetLastError());
+			return 1;
+		}
+
 
 		/* construct an IGMP join request structure */
-		mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
-		mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+		//mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
+		//mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
 
-		/* send an ADD MEMBERSHIP message via setsockopt */
-		if ((setsockopt(socklsn, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
-			perror("setsockopt() failed");
-			return NOK;
-		}
+		///* send an ADD MEMBERSHIP message via setsockopt */
+		//if ((setsockopt(socklsn, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
+		//	perror("setsockopt() failed");
+		//	return NOK;
+		//}
 
 		memset(&Client, 0, sizeof(Client));
 		pipe_open = true;
@@ -140,9 +151,10 @@ void DisconnectClient(void)
 {
 	if (Client.Connected)
 	{
-		closesocket(Client.sockfd);
+		//closesocket(Client.sockfd);
 		memset(&Client, 0, sizeof(CPIPE));
-		//PutLocEvent( NULL, "Client disconnected!" );
+		Client.Connected = false;
+		PutLocEvent( NULL, "Client disconnected!" );
 	}
 }
 
@@ -175,6 +187,37 @@ int WaitForClient(void)
 		memset(recv_str, 0, sizeof(recv_str));
 		from_len = sizeof(from_addr);
 		memset(&from_addr, 0, from_len);
+
+
+		FD_SET set;
+		timeval timeVal;
+
+		FD_ZERO(&set);
+		// Add socket we will wait to read from
+		FD_SET(socklsn, &set);
+
+		// Set timeouts to zero since we want select to return
+		// instantaneously
+		timeVal.tv_sec = 0;
+		timeVal.tv_usec = 0;
+
+		int iResult = select(0 /* ignored */, &set, NULL, NULL, &timeVal);
+
+		// lets check if there was an error during select
+		if (iResult == SOCKET_ERROR)
+		{
+			fprintf(stderr, "select failed with error: %ld\n", WSAGetLastError());
+			continue;
+		}
+
+		// now, lets check if there are any sockets ready
+		if (iResult == 0)
+		{
+			// there are no ready sockets, sleep for a while and check again
+			Sleep(SERVER_SLEEP_TIME);
+			continue;
+		}
+
 
 		/* block waiting to receive a packet */
 		if ((recv_len = recvfrom(socklsn, recv_str, MAX_LEN, 0, (struct sockaddr*) & from_addr, &from_len)) < 0) {
@@ -274,8 +317,30 @@ int SendToPipe(char* msg) {
 			DisconnectClient();
 			return NOK;
 		}
+		struct sockaddr_in mc_addr;  /* socket address structure */
+
+
+		char* mc_addr_str; /* multicast IP address */
+		short mc_port; /* multicast port */
+		mc_addr_str = "239.255.50.50"; //multicast ip address
+		mc_port = 10000;                //multicast port number
+		char mc_ttl = 5;
+		if ((setsockopt(socklsn, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&mc_ttl, sizeof(mc_ttl))) < 0) {
+			perror("setsockopt() failed");
+			exit(1);
+		}
+		memset(&mc_addr, 0, sizeof(mc_addr));
+		mc_addr.sin_family = AF_INET;
+		mc_addr.sin_addr.s_addr = inet_addr(mc_addr_str);
+		mc_addr.sin_port = htons(mc_port);
+		int tolen = sizeof(mc_addr);
+		if ((sendto(socklsn, msg, msg_len, 0, (struct sockaddr*) & mc_addr, tolen)) != msg_len) {
+			perror("sendto() sent incorrect number of bytes");
+			DisconnectClient();
+			return NOK;
+		}
+		return OK;
 	}
-	return OK;
 }
 
 

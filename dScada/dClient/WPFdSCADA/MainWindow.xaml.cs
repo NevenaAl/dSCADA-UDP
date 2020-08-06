@@ -91,8 +91,8 @@ namespace WpfDSCADA
         #region constants
 
         private const int EVENT_LIST_MAX_COUNT = 50;
-        private const int MSG_MAX_LEN = 1500;
-        private const int DEFAULT_AUB_PORT = 9995;
+        private const int MSG_MAX_LEN = 15000;
+        private const int DEFAULT_AUB_PORT = 8080;
 
         #endregion
 
@@ -188,6 +188,23 @@ namespace WpfDSCADA
                         //NoDelay = true,
                         //SendBufferSize = 1
                     };
+                    IPAddress mcIP;  // Multicast group to join
+                    int mcPort;   // Port to receive on
+                    mcPort = 10000;
+                    mcIP = IPAddress.Parse("239.255.50.50");
+                    ClientSocket.SetSocketOption(SocketOptionLevel.Socket,
+                                     SocketOptionName.ReuseAddress,
+                                     1);
+                    // Create an IPEndPoint and bind to it
+                    IPEndPoint ipep = new IPEndPoint(IPAddress.Any, mcPort);
+                    ClientSocket.Bind(ipep);
+
+                    // Add membership in the multicast group
+                    ClientSocket.SetSocketOption(SocketOptionLevel.IP,
+                                         SocketOptionName.AddMembership,
+                                         new MulticastOption(mcIP, IPAddress.Any));
+
+                  
                 }
 
                 if (!ClientSocket.Connected)
@@ -195,8 +212,8 @@ namespace WpfDSCADA
                     // pokusaj konekciju na AUB, na prvu ili drugu host masinu
                     try
                     {
-                        ClientSocket.Connect("239.255.10.10", DEFAULT_AUB_PORT);
-                        //ClientSocket.Connect("localhost", DEFAULT_AUB_PORT);
+                        //ClientSocket.Connect("239.255.10.10", DEFAULT_AUB_PORT);
+                        ClientSocket.Connect("localhost", DEFAULT_AUB_PORT);
                         // uspesna konekcija na Host
                         ClientConnected = true;
                         // izbrisi sve iz listi 
@@ -228,23 +245,15 @@ namespace WpfDSCADA
 
                 if (ClientConnected)
                 {
-                    /*while (ClientSocket != null)
-                    {
-                        try
-                        {
-                            int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                    }*/
-                    
-                    IPEndPoint receivePoint = new IPEndPoint(IPAddress.Any, 9995);
-
+                    IPEndPoint receivePoint;  // IP endpoint
+                                              // Create the EndPoint class
+                    receivePoint = new IPEndPoint(IPAddress.Any, DEFAULT_AUB_PORT);
                     EndPoint tempReceivePoint = (EndPoint)receivePoint;
-                    int rsts2 = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None,ref tempReceivePoint);
+                     int length = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None, ref tempReceivePoint);
+
                     
+                    //int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
+
                     /*int bcnt = 0;                           // byte count
                     while (ClientSocket != null && bcnt < MSG_MAX_LEN)
                     {

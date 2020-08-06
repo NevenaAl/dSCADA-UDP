@@ -25,3 +25,14 @@
 <08/03/20 21:30:14> Client ioctlsocket read problem! Error code: 10038
 <08/03/20 21:34:33> Client ioctlsocket read problem! Error code: 10038
 <08/03/20 22:01:15> Client ioctlsocket read problem! Error code: 10038
+<08/05/20 17:14:36> Client ioctlsocket read problem! Error code: 10038
+<08/05/20 17:53:51> Client ioctlsocket read problem! Error code: 10038
+<08/05/20 18:04:40> Client ioctlsocket read problem! Error code: 10093
+<08/05/20 19:37:15> Client ioctlsocket read problem! Error code: 10093
+<08/05/20 19:42:24> Client ioctlsocket read problem! Error code: 10093
+<08/05/20 20:51:37> Client ioctlsocket read problem! Error code: 10093
+<08/05/20 21:01:32> Client ioctlsocket read problem! Error code: 10093
+<08/06/20 18:05:12> Client ioctlsocket read problem! Error code: 10093
+<08/06/20 18:48:42> Client ioctlsocket read problem! Error code: 10093
+<08/06/20 18:56:16> Client ioctlsocket read problem! Error code: 10093
+<08/06/20 19:48:49> Client ioctlsocket read problem! Error code: 10038
