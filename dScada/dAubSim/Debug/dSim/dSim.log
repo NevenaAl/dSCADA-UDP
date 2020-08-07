@@ -1,5 +1,7 @@
 ﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
   PipeFun.cpp
-D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(344): warning C4715: 'SendToPipe': not all control paths return a value
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(258,9): warning C4101: 'bcnt': unreferenced local variable
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(346,22): warning C4101: 'mc_addr': unreferenced local variable
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(370): warning C4715: 'SendToPipe': not all control paths return a value
   dSim.vcxproj -> D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dSim\dSim.exe
           1 file(s) copied.

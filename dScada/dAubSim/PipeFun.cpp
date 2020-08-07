@@ -1,8 +1,6 @@
 #pragma once
 #include "stdafx.h"
 
-void ProcessCmd(void);
-
 //#include <WinSock2.h> 
 //#define _WINSOCK_DEPCRECATED_NO_WARNINGS
 //#include <sys/types.h> /* for type definitions */
@@ -31,7 +29,6 @@ void ProcessCmd(void);
 
 typedef struct
 {								// Client TCP Pipe
-	SOCKET sockfd;
 	struct sockaddr_in address;
 	char sMsg[CMSG_MAX_SLEN];		// bafer za slanje poruke
 	char rMsg[CMSG_MAX_RLEN];
@@ -79,7 +76,7 @@ int OpenPipe(void) {
 		struct sockaddr_in mc_addr;  /* socket address structure */
 		
 		
-		char* mc_addr_str; /* multicast IP address */
+		//char* mc_addr_str; /* multicast IP address */
 		short mc_port; /* multicast port */
 		
 		WSADATA wsaData;
@@ -89,7 +86,7 @@ int OpenPipe(void) {
 			return NOK;
 		}
 
-		mc_addr_str = "239.255.50.50"; //multicast ip address
+		//mc_addr_str = "239.255.50.50"; //multicast ip address
 		mc_port = 8080;                //multicast port number
 
 									 /* validate the port range */
@@ -176,7 +173,7 @@ void ClosePipe(void)
 	pipe_open = false;
 }
 
-int WaitForClient(void)
+int WaitForMessage(void)
 {
 	char recv_str[MAX_LEN + 1]; /* buffer to receive string */
 	memset(&Client.address, 0, sizeof(Client.address));
@@ -184,10 +181,10 @@ int WaitForClient(void)
 	struct sockaddr_in from_addr;  /* packet source */
 	int from_len;  /* source addr length */
 	for (; ;) {
+
 		memset(recv_str, 0, sizeof(recv_str));
 		from_len = sizeof(from_addr);
 		memset(&from_addr, 0, from_len);
-
 
 		FD_SET set;
 		timeval timeVal;
@@ -220,23 +217,27 @@ int WaitForClient(void)
 
 
 		/* block waiting to receive a packet */
-		if ((recv_len = recvfrom(socklsn, recv_str, MAX_LEN, 0, (struct sockaddr*) & from_addr, &from_len)) < 0) {
+		if ((recv_len = recvfrom(socklsn, recv_str, MAX_LEN, 0, (struct sockaddr*) & from_addr, &from_len)) <= 0) {
+			DisconnectClient();				//  prekid veze
 			perror("recvfrom() failed");
-			return NOK;
+			break;
 		}
 
-		/* output received string */
-		//printf("Received %d bytes from %s: ", recv_len, inet_ntoa(from_addr.sin_addr));
-		//printf("%s", recv_str);
-		if (!Client.Connected)
-		{
-			//Client.sockfd = from_addr;
-			Client.address =  from_addr;
+		
+		if (strcmp(recv_str,"connected\n") ==0) {
+			Client.address = from_addr;
 			Client.Connected = true;
 			Client.cRead = 0;
 			InitClient();
 			PutLocEvent(NULL, "Station %s: Client connected!", StnCfg.StaName);
-
+		}
+		else {
+			
+			strcpy(Client.rMsg, recv_str);
+			Client.cRead = recv_len;
+			Client.rMsg[Client.cRead++] = 0;
+			ProcessCmd();
+			Client.cRead = 0;
 		}
 	}
 	
@@ -244,63 +245,6 @@ int WaitForClient(void)
 	return OK;
 }
 
-
-// Primi poruke (commands) koje salje klijent 
-void CheckForCmd(void)
-{
-	u_long bcnt;
-	if (Client.Connected)
-	{
-		// vidi je li sta i poslao
-		int rsts = ioctlsocket(Client.sockfd, FIONREAD, (u_long FAR*)&bcnt);
-		// proveri da li je javio neku gresku
-		if (rsts == SOCKET_ERROR)
-		{
-			PutLogMessage("Client ioctlsocket read problem! Error code: %d", WSAGetLastError());
-			DisconnectClient();				//  prekid veze
-			return;
-		}
-
-		while (bcnt)
-		{
-			// ucitavaj jedan po jedan znak
-			char RxChar;
-			rsts = recv(Client.sockfd, (char*)&RxChar, 1, 0);
-			if (rsts <= 0)
-			{
-				DisconnectClient();				//  prekid veze
-				break;
-			}
-			else
-			{
-				// smanji bcnt
-				bcnt -= 1;
-				// akumuliraj poruku do \n (prihvati poslati string)
-				if (RxChar != '\n')
-				{
-					Client.rMsg[Client.cRead++] = RxChar;
-				}
-				else
-				{
-					// terminiraj string i pozovi obradu 
-					Client.rMsg[Client.cRead++] = 0;
-					ProcessCmd();
-					Client.cRead = 0;
-					//PutLogMsg( cMsg );
-					break;
-				}
-			}
-		}
-	}
-}
-
-void WaitForCmd(void)
-{
-	do
-	{
-		CheckForCmd();
-	} while (Client.Connected);
-}
 
 // Primi poruke (commands) koje salje klijent 
 
@@ -317,28 +261,28 @@ int SendToPipe(char* msg) {
 			DisconnectClient();
 			return NOK;
 		}
-		struct sockaddr_in mc_addr;  /* socket address structure */
+		struct sockaddr_in mc_addr;  // socket address structure 
 
 
-		char* mc_addr_str; /* multicast IP address */
-		short mc_port; /* multicast port */
+		char* mc_addr_str; // multicast IP address 
+		short mc_port; // multicast port 
 		mc_addr_str = "239.255.50.50"; //multicast ip address
-		mc_port = 10000;                //multicast port number
+		mc_port = 9995;                //multicast port number
 		char mc_ttl = 5;
-		if ((setsockopt(socklsn, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&mc_ttl, sizeof(mc_ttl))) < 0) {
+		/*if ((setsockopt(socklsn, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&mc_ttl, sizeof(mc_ttl))) < 0) {
 			perror("setsockopt() failed");
 			exit(1);
 		}
 		memset(&mc_addr, 0, sizeof(mc_addr));
 		mc_addr.sin_family = AF_INET;
-		mc_addr.sin_addr.s_addr = inet_addr(mc_addr_str);
-		mc_addr.sin_port = htons(mc_port);
+		mc_addr.sin_addr.s_addr = htonl(inet_addr(mc_addr_str));
+		mc_addr.sin_port = htons((u_short)mc_port);
 		int tolen = sizeof(mc_addr);
 		if ((sendto(socklsn, msg, msg_len, 0, (struct sockaddr*) & mc_addr, tolen)) != msg_len) {
 			perror("sendto() sent incorrect number of bytes");
 			DisconnectClient();
 			return NOK;
-		}
+		}*/
 		return OK;
 	}
 }
@@ -651,8 +595,7 @@ void ProcessCmd(void)
 int OpenPipes(void)
 void DisconnectClient(void)
 void ClosePipes(void)
-int WaitForClient(void)
-void WaitForCmd(void)
+int WaitForMessage(void)
 int SendToPipe(char *msg)
 void PutRtuSts(char *ime, int val)
 void InitClient(void)

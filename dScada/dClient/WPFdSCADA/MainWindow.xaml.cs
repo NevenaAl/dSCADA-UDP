@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Media;
 using System.Text;
 using System.Net;
+using System.Linq.Expressions;
 
 namespace WpfDSCADA
 {
@@ -188,9 +189,9 @@ namespace WpfDSCADA
                         //NoDelay = true,
                         //SendBufferSize = 1
                     };
-                    IPAddress mcIP;  // Multicast group to join
+                    /*IPAddress mcIP;  // Multicast group to join
                     int mcPort;   // Port to receive on
-                    mcPort = 10000;
+                    mcPort = 9995;
                     mcIP = IPAddress.Parse("239.255.50.50");
                     ClientSocket.SetSocketOption(SocketOptionLevel.Socket,
                                      SocketOptionName.ReuseAddress,
@@ -202,7 +203,7 @@ namespace WpfDSCADA
                     // Add membership in the multicast group
                     ClientSocket.SetSocketOption(SocketOptionLevel.IP,
                                          SocketOptionName.AddMembership,
-                                         new MulticastOption(mcIP, IPAddress.Any));
+                                         new MulticastOption(mcIP, IPAddress.Any)); */
 
                   
                 }
@@ -245,24 +246,37 @@ namespace WpfDSCADA
 
                 if (ClientConnected)
                 {
-                    IPEndPoint receivePoint;  // IP endpoint
+                    //IPEndPoint receivePoint;  // IP endpoint
                                               // Create the EndPoint class
-                    receivePoint = new IPEndPoint(IPAddress.Any, DEFAULT_AUB_PORT);
-                    EndPoint tempReceivePoint = (EndPoint)receivePoint;
-                     int length = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None, ref tempReceivePoint);
+                    //receivePoint = new IPEndPoint(IPAddress.Any, DEFAULT_AUB_PORT);
+                    //EndPoint tempReceivePoint = (EndPoint)receivePoint;
+                    //int length = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None, ref tempReceivePoint);
 
-                    
-                    //int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
-
-                    /*int bcnt = 0;                           // byte count
-                    while (ClientSocket != null && bcnt < MSG_MAX_LEN)
+                    try
                     {
-                        try
+                        int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
+                        
+                        if (rsts <= 0)
                         {
-                            int rsts = ClientSocket.Receive(RxBuff, bcnt, 1, SocketFlags.None);
-
-                            if (rsts <= 0)
-                            {
+                            ClientConnected = false;
+                            Dispatcher.Invoke(new DelegateUpdateIcon(updateIcon));      // namesti crvenu ikonicu
+                            ClientSocket.Shutdown(SocketShutdown.Both);                 // Release the socket.  
+                            ClientSocket.Close();
+                            ClientSocket = null;
+                        }
+                        else
+                        {
+                            string msg = Encoding.ASCII.GetString(RxBuff, 0, rsts);
+                            Dispatcher.Invoke(DispatcherPriority.Normal, new DelegateProcessMsg(processMsg), msg);
+                        }
+                    } catch (SocketException se)
+                    {
+                        switch (se.ErrorCode)
+                        {
+                            case 10054:
+                            case 10060:
+                            //break;
+                            default:
                                 // konekcija je prekinuta
                                 ClientConnected = false;
                                 Dispatcher.Invoke(new DelegateUpdateIcon(updateIcon));      // namesti crvenu ikonicu
@@ -270,34 +284,8 @@ namespace WpfDSCADA
                                 ClientSocket.Close();
                                 ClientSocket = null;
                                 break;
-                            }
-                            else if (RxBuff[bcnt] == '\n')                                       // primaj sve do \n
-                            {
-                                //string msg = Encoding.Unicode.GetString(RxBuff, 0, bcnt);
-                                string msg = Encoding.ASCII.GetString(RxBuff, 0, bcnt);
-                                Dispatcher.Invoke(DispatcherPriority.Normal, new DelegateProcessMsg(processMsg), msg);
-                                break;
-                            }
-                            bcnt += 1;
                         }
-                        catch (SocketException se)
-                        {
-                            switch (se.ErrorCode)
-                            {
-                                case 10054:
-                                case 10060:
-                                //break;
-                                default:
-                                    // konekcija je prekinuta
-                                    ClientConnected = false;
-                                    Dispatcher.Invoke(new DelegateUpdateIcon(updateIcon));      // namesti crvenu ikonicu
-                                    ClientSocket.Shutdown(SocketShutdown.Both);                 // Release the socket.  
-                                    ClientSocket.Close();
-                                    ClientSocket = null;
-                                    break;
-                            }
-                        }
-                    }*/
+                    }
                 }
                 //Application.Current.Dispatcher.Invoke(new Action(() => printEvent(ClientSocket.Connected.ToString())));
                 //Thread.Sleep(500);
@@ -384,7 +372,7 @@ namespace WpfDSCADA
                         setCmdType(devTemp);
                         ProcVarList.Add(devTemp);
                         break;
-                    case "init_done":
+                    case "init_done\n":
                         Grid0.Visibility = Visibility.Visible;
                         // napravi potrebne combo kutije
                         commandComboBox.ItemsSource = getAllCommands();

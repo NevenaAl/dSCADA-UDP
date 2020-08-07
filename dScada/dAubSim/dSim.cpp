@@ -132,8 +132,8 @@ DWORD WINAPI PipeTask( LPVOID pData )
     while( !ServerShutdown )
     {
         // Sacekaj klijenta da se javi
-        WaitForClient();                 // konekcijom
-        WaitForCmd();                    // poslatom komandom
+        WaitForMessage();                 // konekcijom ili poslatom komandom
+
     }
     ClosePipe();     // zatvori cevi
     return 0;
