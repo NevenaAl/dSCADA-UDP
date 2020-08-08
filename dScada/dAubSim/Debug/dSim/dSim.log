@@ -1,7 +1,29 @@
 ﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  StdAfx.cpp
+cl : command line warning D9028: minimal rebuild failure, reverting to normal build
+cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  dSim.cpp
+  Timers.cpp
+  Simulator.cpp
+  SimRandom.cpp
+  SimPlant.cpp
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\Simulator\SimPlant.cpp(218,25): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  SimLib.cpp
+  ReadConfigFile.cpp
+  pvidstr.cpp
+  Ioascii.cpp
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\RTDataBase\Ioascii.cpp(2203,4): warning C4102: 'end': unreferenced label
+  Globals.cpp
+  processing.cpp
+  conversion.cpp
   PipeFun.cpp
-D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(258,9): warning C4101: 'bcnt': unreferenced local variable
-D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(346,22): warning C4101: 'mc_addr': unreferenced local variable
-D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(370): warning C4715: 'SendToPipe': not all control paths return a value
+  Loger.cpp
+  HashFun.cpp
+  Event.cpp
+  DemoSimDlg.cpp
+  DemoAUB.cpp
+  ApplicationSpecific.cpp
+  AUBTime.cpp
+  Generating Code...
   dSim.vcxproj -> D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dSim\dSim.exe
           1 file(s) copied.

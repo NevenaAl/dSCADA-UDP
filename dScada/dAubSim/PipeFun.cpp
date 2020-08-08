@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
 
+void ProcessCmd();
+
 //#include <WinSock2.h> 
 //#define _WINSOCK_DEPCRECATED_NO_WARNINGS
 //#include <sys/types.h> /* for type definitions */
@@ -26,10 +28,11 @@
 #define CMSG_MAX_SLEN 1500			// Client Send Msg
 #define CMSG_MAX_RLEN 250			// Client Recv Msg
 #define MAX_CLIENT_NUMBER 10        // Max number of connected clients
+#define MC_IP_ADDRESS "238.255.255.255"  // Multicast group ip address
+#define MC_PORT 9995					// Multicast group port
 
 typedef struct
-{								// Client TCP Pipe
-	struct sockaddr_in address;
+{									// Client TCP Pipe
 	char sMsg[CMSG_MAX_SLEN];		// bafer za slanje poruke
 	char rMsg[CMSG_MAX_RLEN];
 	bool Connected;
@@ -37,16 +40,11 @@ typedef struct
 	int cRead;
 } CPIPE;
 
-//  multicast request structure */
-struct ip_mreq2 {
-	struct in_addr imr_multiaddr; /* Group multicast address */
-	struct in_addr imr_interface; /* Local interface address */
-}mc_req;
 
 static SOCKET socklsn;
-//static CPIPE Client[MAX_CLIENT_NUMBER];
 static CPIPE Client;
-//int NoClients = 0;
+int NoConnectedClients = 0;
+int NoAllClients = 0;
 
 
 
@@ -70,87 +68,77 @@ bool get_flag(char *str)
 static bool pipe_open = false;
 int OpenPipe(void) {
 
+		int flag_on = 1;				 // socket option flag 
+		struct sockaddr_in server_addr;  // socket address structure 
+		short server_port;				// server port 
+		server_port = 8080;				 //server port number
 
-		//int sock;  /* socket descriptor */
-		int flag_on = 1;  /* socket option flag */
-		struct sockaddr_in mc_addr;  /* socket address structure */
-		
-		
-		//char* mc_addr_str; /* multicast IP address */
-		short mc_port; /* multicast port */
-		
 		WSADATA wsaData;
-		/* Load Winsock 2.0 DLL */
+		// Load Winsock 2.0 DLL 
 		if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0) {
 			fprintf(stderr, "WSAStartup() failed");
 			return NOK;
 		}
 
-		//mc_addr_str = "239.255.50.50"; //multicast ip address
-		mc_port = 8080;                //multicast port number
-
-									 /* validate the port range */
-		if ((mc_port < MIN_PORT) || (mc_port > MAX_PORT)) {
-			fprintf(stderr, "Invalid port number argument %d.\n", mc_port);
+		 // validate the port range 
+		if ((server_port < MIN_PORT) || (server_port > MAX_PORT)) {
+			fprintf(stderr, "Invalid port number argument %d.\n", server_port);
 			fprintf(stderr, "Valid range is between %d and %d.\n", MIN_PORT, MAX_PORT);
 			return NOK;
 		}
 
-		/* create socket to join multicast group on */
+		// create socket  
 		if ((socklsn = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
 			perror("socket() failed");
 			return NOK;
 		}
 
-		/* set reuse port to on to allow multiple binds per host */
-		/*if ((setsockopt(socklsn, SOL_SOCKET, SO_REUSEADDR, (char*)&flag_on, sizeof(flag_on))) < 0) {
-			perror("setsockopt() failed");
-			return NOK;
-		}*/
+		// construct a server address structure 
+		memset(&server_addr, 0, sizeof(server_addr));
+		server_addr.sin_family = AF_INET;
+		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		server_addr.sin_port = htons((u_short)server_port);
 
-		/* construct a multicast address structure */
-		memset(&mc_addr, 0, sizeof(mc_addr));
-		mc_addr.sin_family = AF_INET;
-		mc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		mc_addr.sin_port = htons((u_short)mc_port);
-
-		/* bind multicast address to socket */
-		if ((bind(socklsn, (struct sockaddr*) & mc_addr, sizeof(mc_addr))) < 0) {
+		// bind  address to socket 
+		if ((bind(socklsn, (struct sockaddr*) & server_addr, sizeof(server_addr))) < 0) {
 			perror("bind() failed");
 			return NOK;
 		}
+
+		// set socket to non blocking mode
 		unsigned long int nonBlockingMode = 1;
 		int iResult = ioctlsocket(socklsn, FIONBIO, &nonBlockingMode);
 
 		if (iResult == SOCKET_ERROR)
 		{
 			printf("ioctlsocket failed with error: %ld\n", WSAGetLastError());
-			return 1;
+			return NOK;
 		}
-
-
-		/* construct an IGMP join request structure */
-		//mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
-		//mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
-
-		///* send an ADD MEMBERSHIP message via setsockopt */
-		//if ((setsockopt(socklsn, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
-		//	perror("setsockopt() failed");
-		//	return NOK;
-		//}
 
 		memset(&Client, 0, sizeof(Client));
 		pipe_open = true;
 		return OK;
 }
-
+void ConnectClient(void) 
+{
+	Client.Connected = true;
+	Client.cRead = 0;
+	NoConnectedClients++;
+	NoAllClients++;
+	InitClient();
+	PutLocEvent(NULL, "Station %s: Client %d connected!", StnCfg.StaName, NoAllClients);
+}
 void DisconnectClient(void)
 {
 	if (Client.Connected)
 	{
-		//closesocket(Client.sockfd);
-		memset(&Client, 0, sizeof(CPIPE));
-		Client.Connected = false;
+		NoConnectedClients--;
+		if (NoConnectedClients == 0)
+		{
+			memset(&Client, 0, sizeof(CPIPE));
+			Client.Connected = false;
+		}
+		
 		PutLocEvent( NULL, "Client disconnected!" );
 	}
 }
@@ -160,13 +148,10 @@ void ClosePipe(void)
 	if (pipe_open)
 	{
 		closesocket(socklsn);
-		if ((setsockopt(socklsn, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mc_req, sizeof(mc_req))) < 0) {
-			perror("setsockopt() failed");
-			exit(1);
-		}
+		
 		if (Client.Connected)
 		{
-			//closesocket(Client.sockfd);
+			//ovde javiti klijentima da je servr ugasen, da li?
 			memset(&Client, 0, sizeof(CPIPE));
 		}
 	}
@@ -175,11 +160,11 @@ void ClosePipe(void)
 
 int WaitForMessage(void)
 {
-	char recv_str[MAX_LEN + 1]; /* buffer to receive string */
-	memset(&Client.address, 0, sizeof(Client.address));
-	int recv_len; /* length of string received */
-	struct sockaddr_in from_addr;  /* packet source */
-	int from_len;  /* source addr length */
+	char recv_str[MAX_LEN + 1];			// buffer to receive string 
+	int recv_len;						// length of string received 
+	struct sockaddr_in from_addr;		// packet source 
+	int from_len;						// source addr length 
+
 	for (; ;) {
 
 		memset(recv_str, 0, sizeof(recv_str));
@@ -215,24 +200,25 @@ int WaitForMessage(void)
 			continue;
 		}
 
-
-		/* block waiting to receive a packet */
+		// block waiting to receive a packet 
 		if ((recv_len = recvfrom(socklsn, recv_str, MAX_LEN, 0, (struct sockaddr*) & from_addr, &from_len)) <= 0) {
-			DisconnectClient();				//  prekid veze
+			DisconnectClient();				
 			perror("recvfrom() failed");
 			break;
 		}
 
 		
-		if (strcmp(recv_str,"connected\n") ==0) {
-			Client.address = from_addr;
-			Client.Connected = true;
-			Client.cRead = 0;
-			InitClient();
-			PutLocEvent(NULL, "Station %s: Client connected!", StnCfg.StaName);
+		if (strcmp(recv_str,"connected\n") ==0)
+		{
+			ConnectClient();
 		}
-		else {
-			
+		else if (strcmp(recv_str, "disconnected\n") == 0)
+		{
+			DisconnectClient();
+		}
+		else
+		{
+			// command from client received
 			strcpy(Client.rMsg, recv_str);
 			Client.cRead = recv_len;
 			Client.rMsg[Client.cRead++] = 0;
@@ -253,38 +239,36 @@ int WaitForMessage(void)
 int SendToPipe(char* msg) {
 	if (Client.Connected)
 	{
-		int length, msg_len;
-		length = sizeof(Client.address);
+		int  msg_len;
 		msg_len = strlen(msg);
-		if ((sendto(socklsn, msg, msg_len, 0, (const struct sockaddr*)&Client.address, length)) != msg_len) {
-			perror("sendto() sent incorrect number of bytes");
-			DisconnectClient();
+		
+		struct sockaddr_in mc_addr;		// socket address structure 
+		char* mc_addr_str;				// multicast IP address 
+		short mc_port;					// multicast port 
+		mc_addr_str = MC_IP_ADDRESS;	//multicast ip address
+		mc_port = MC_PORT;				//multicast port number
+		const char mc_ttl = 6;
+
+		
+		if ((setsockopt(socklsn, IPPROTO_IP, IP_MULTICAST_TTL, &mc_ttl, sizeof(mc_ttl))) < 0) {
+			perror("setsockopt() failed");
 			return NOK;
 		}
-		struct sockaddr_in mc_addr;  // socket address structure 
 
-
-		char* mc_addr_str; // multicast IP address 
-		short mc_port; // multicast port 
-		mc_addr_str = "239.255.50.50"; //multicast ip address
-		mc_port = 9995;                //multicast port number
-		char mc_ttl = 5;
-		/*if ((setsockopt(socklsn, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&mc_ttl, sizeof(mc_ttl))) < 0) {
-			perror("setsockopt() failed");
-			exit(1);
-		}
 		memset(&mc_addr, 0, sizeof(mc_addr));
 		mc_addr.sin_family = AF_INET;
-		mc_addr.sin_addr.s_addr = htonl(inet_addr(mc_addr_str));
+		mc_addr.sin_addr.s_addr = inet_addr(mc_addr_str);
 		mc_addr.sin_port = htons((u_short)mc_port);
 		int tolen = sizeof(mc_addr);
-		if ((sendto(socklsn, msg, msg_len, 0, (struct sockaddr*) & mc_addr, tolen)) != msg_len) {
+
+		if ((sendto(socklsn, msg, msg_len, 0, (const struct sockaddr*) & mc_addr, tolen)) != msg_len) {
 			perror("sendto() sent incorrect number of bytes");
 			DisconnectClient();
 			return NOK;
-		}*/
+		}
 		return OK;
 	}
+	return OK;
 }
 
 
@@ -594,6 +578,7 @@ void ProcessCmd(void)
 #ifndef TRUE
 int OpenPipes(void)
 void DisconnectClient(void)
+void ConnectClient(void)
 void ClosePipes(void)
 int WaitForMessage(void)
 int SendToPipe(char *msg)

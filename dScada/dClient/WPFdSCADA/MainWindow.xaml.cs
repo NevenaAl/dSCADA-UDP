@@ -102,6 +102,7 @@ namespace WpfDSCADA
             InitializeComponent();
 
             ReadConfig();
+            Closing += new CancelEventHandler(MainWindow_Closing);
 
             Thread ThreadReadClientInst = new Thread(ThreadReadClient);
             ThreadReadClientInst.Start();
@@ -136,7 +137,11 @@ namespace WpfDSCADA
 
             this.DataContext = this;
         }
-
+        void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            SendToHost("disconnected");
+            ClientSocket.Close();
+        }
         private void ReadConfig()
         {
             // Open the configuration file 
@@ -189,10 +194,10 @@ namespace WpfDSCADA
                         //NoDelay = true,
                         //SendBufferSize = 1
                     };
-                    /*IPAddress mcIP;  // Multicast group to join
+                    IPAddress mcIP;  // Multicast group to join
                     int mcPort;   // Port to receive on
                     mcPort = 9995;
-                    mcIP = IPAddress.Parse("239.255.50.50");
+                    mcIP = IPAddress.Parse("238.255.255.255");
                     ClientSocket.SetSocketOption(SocketOptionLevel.Socket,
                                      SocketOptionName.ReuseAddress,
                                      1);
@@ -203,7 +208,7 @@ namespace WpfDSCADA
                     // Add membership in the multicast group
                     ClientSocket.SetSocketOption(SocketOptionLevel.IP,
                                          SocketOptionName.AddMembership,
-                                         new MulticastOption(mcIP, IPAddress.Any)); */
+                                         new MulticastOption(mcIP, IPAddress.Any)); 
 
                   
                 }
@@ -363,21 +368,31 @@ namespace WpfDSCADA
                 switch (split[0])
                 {
                     case "init_start":
-                        ProcVarList.Clear();
-                        Grid0.Visibility = Visibility.Hidden;
-                        initDone = false;
+                        if (!initDone)
+                        {
+                            ProcVarList.Clear();
+                            Grid0.Visibility = Visibility.Hidden;
+                            initDone = false;
+                        }
+                       
                         break;
                     case "init":
-                        ProcVar devTemp = new ProcVar(split);
-                        setCmdType(devTemp);
-                        ProcVarList.Add(devTemp);
+                        if (!initDone)
+                        {
+                            ProcVar devTemp = new ProcVar(split);
+                            setCmdType(devTemp);
+                            ProcVarList.Add(devTemp);
+                        }
                         break;
                     case "init_done\n":
-                        Grid0.Visibility = Visibility.Visible;
-                        // napravi potrebne combo kutije
-                        commandComboBox.ItemsSource = getAllCommands();
-                        manualInputComboBox.ItemsSource = getAllStates();
-                        initDone = true;
+                        if (!initDone)
+                        {
+                            Grid0.Visibility = Visibility.Visible;
+                            // napravi potrebne combo kutije
+                            commandComboBox.ItemsSource = getAllCommands();
+                            manualInputComboBox.ItemsSource = getAllStates();
+                            initDone = true;
+                        }
                         break;
                     case "tags":
                         UpdateDevTags(split);                              // osvezavanje tagova PVars
@@ -1160,6 +1175,10 @@ namespace WpfDSCADA
             {
                 AUBEventList.Remove(currEvent);
             }
+        }
+        private void closeClient_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void unselectDataGridButton_Click(object sender, RoutedEventArgs e)

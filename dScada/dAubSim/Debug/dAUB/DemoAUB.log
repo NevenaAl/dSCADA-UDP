@@ -1,1 +1,31 @@
-﻿
+﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  StdAfx.cpp
+cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  Ioascii.cpp
+  Globals.cpp
+  modbus.cpp
+  ApplicationSpecific.cpp
+  UdpPort.cpp
+  UartPort.cpp
+  Timers.cpp
+  TcpPort.cpp
+  pvidstr.cpp
+  ReadConfigFile.cpp
+  Processing.cpp
+  Conversion.cpp
+  PipeFun.cpp
+  Loger.cpp
+  HashFun.cpp
+  Event.cpp
+  DemoAUBDlg.cpp
+  DemoAUB.cpp
+  dAUB.cpp
+  ComPort.cpp
+  Generating Code...
+D:\Desktop\dSCADA-UDP\dScada\dAubSim\PipeFun.cpp(290): warning C4715: 'SendToPipe': not all control paths return a value
+  Compiling...
+  ComFun.cpp
+  AUBTime.cpp
+  Generating Code...
+  DemoAUB.vcxproj -> D:\Desktop\dSCADA-UDP\dScada\dAubSim\Debug\dAUB\dAUB.exe
+          1 file(s) copied.
