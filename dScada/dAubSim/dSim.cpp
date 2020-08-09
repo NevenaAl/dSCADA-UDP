@@ -149,6 +149,7 @@ DWORD WINAPI RefreshTask( LPVOID pData )
     {
         // posalji sve promene ka klijentu
         RefreshClient();
+        QueueCheck();
         Sleep( 200 );
     }	
     return 0;

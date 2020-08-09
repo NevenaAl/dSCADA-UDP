@@ -160,6 +160,9 @@
     <ClInclude Include="HashFun\uthash.h">
       <Filter>HashFun</Filter>
     </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\exec\AubCfg.txt" />

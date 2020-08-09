@@ -1,20 +1,15 @@
 #pragma once
 #include "stdafx.h"
+#include "Queue.h"
 
 void ProcessCmd();
 
-//#include <WinSock2.h> 
-//#define _WINSOCK_DEPCRECATED_NO_WARNINGS
-//#include <sys/types.h> /* for type definitions */
-//#include <winsock.h> //umjeso sys socketa i arpa
-//#include <stdio.h>/* for printf() and fprintf() */
-//#include <stdlib.h>/* for atoi() */
-//#include <string.h>/* for strlen() */
 
 #define MAX_LEN 1024 /* maximum receive string size */
 #define MIN_PORT 1024 /* minimum port allowed */
 #define  MAX_PORT 65535 /* maximum port allowed */
 #define SERVER_SLEEP_TIME 50
+#define MESSAGE_TIMEOUT 30
 #define IP_ADD_MEMBERSHIP         12 
 #define IP_DROP_MEMBERSHIP        13
 
@@ -41,9 +36,18 @@ typedef struct
 } CPIPE;
 
 
+typedef struct
+{
+	char* message;
+	int sequence_num;
+} SEND_MESSAGE;
+
+
 static SOCKET socklsn;
 static CPIPE Client;
+struct MessageQueue* messageQueue;
 int NoConnectedClients = 0;
+int NoSentMessages = 0;
 int NoAllClients = 0;
 
 
@@ -116,6 +120,7 @@ int OpenPipe(void) {
 		}
 
 		memset(&Client, 0, sizeof(Client));
+		messageQueue = CreateMessageQueue(1000);
 		pipe_open = true;
 		return OK;
 }
@@ -216,6 +221,12 @@ int WaitForMessage(void)
 		{
 			DisconnectClient();
 		}
+		else if (strstr(recv_str, "NACK") != NULL) {
+			char delim[] = ":";
+			char* ptr = strtok(recv_str, delim);
+			ptr = strtok(NULL, delim);
+			ResendMessage(ptr);
+		}
 		else
 		{
 			// command from client received
@@ -231,7 +242,16 @@ int WaitForMessage(void)
 	return OK;
 }
 
-
+void ResendMessage(char* seq_number) {
+	int seq = atoi(seq_number);
+	for (int i = messageQueue->front;i < messageQueue->front + messageQueue->size;i++) {
+		MESSAGE item = messageQueue->array[i];
+		if (item.sequence_num == seq) {
+			SendToPipe(item.message);
+			break;
+		}
+	}
+}
 // Primi poruke (commands) koje salje klijent 
 
 // slanje stringa na PipeOUT
@@ -239,14 +259,22 @@ int WaitForMessage(void)
 int SendToPipe(char* msg) {
 	if (Client.Connected)
 	{
+	    struct MESSAGE message;
+		memcpy(message.message, msg, strlen(msg) + 1);
+//		message.message = msg;
+		message.sending_time = time(0);
+		message.sequence_num = NoSentMessages+1;
+
+		Enqueue(messageQueue, message);
+
 		int  msg_len;
 		msg_len = strlen(msg);
 		
 		struct sockaddr_in mc_addr;		// socket address structure 
 		char* mc_addr_str;				// multicast IP address 
 		short mc_port;					// multicast port 
-		mc_addr_str = MC_IP_ADDRESS;	//multicast ip address
-		mc_port = MC_PORT;				//multicast port number
+		mc_addr_str = MC_IP_ADDRESS;	// multicast ip address
+		mc_port = MC_PORT;				// multicast port number
 		const char mc_ttl = 6;
 
 		
@@ -266,11 +294,25 @@ int SendToPipe(char* msg) {
 			DisconnectClient();
 			return NOK;
 		}
+		NoSentMessages++;
 		return OK;
 	}
 	return OK;
 }
 
+void QueueCheck(void ) {
+
+	if (Client.Connected) {
+		time_t now = time(0);
+		if (!IsEmptyMessageQueue(messageQueue)) {
+			MESSAGE item = messageQueue->array[messageQueue->front];
+			if (now - item.sending_time >= MESSAGE_TIMEOUT) {
+				Dequeue(messageQueue);
+			}
+		}
+	}
+	
+}
 
 // Oznaci promenu statusa RTU kontrolera
 int PutRtuSts(char *ime, int val)
@@ -581,7 +623,9 @@ void DisconnectClient(void)
 void ConnectClient(void)
 void ClosePipes(void)
 int WaitForMessage(void)
+void QueueCheck(void)
 int SendToPipe(char *msg)
+void ResendMessage(char* seq_number)
 void PutRtuSts(char *ime, int val)
 void InitClient(void)
 void RefreshClient(void)

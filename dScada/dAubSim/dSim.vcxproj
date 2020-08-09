@@ -199,6 +199,7 @@
     <ClInclude Include="HashFun\HashFun.h" />
     <ClInclude Include="HashFun\uthash.h" />
     <ClInclude Include="PipeFun.h" />
+    <ClInclude Include="Queue.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RTDataBase\pvidstr.h" />
     <ClInclude Include="Simulator\Simulator.h" />

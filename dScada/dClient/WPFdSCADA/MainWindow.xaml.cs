@@ -88,6 +88,7 @@ namespace WpfDSCADA
         static Socket ClientSocket = null;
         static bool ClientConnected;            // povezan sa AUBom
         public bool LoadDone;                   // napunjen od AUBa
+        public int LastMessageReceived = 0;     // seq number of last received message
 
         #region constants
 
@@ -218,7 +219,6 @@ namespace WpfDSCADA
                     // pokusaj konekciju na AUB, na prvu ili drugu host masinu
                     try
                     {
-                        //ClientSocket.Connect("239.255.10.10", DEFAULT_AUB_PORT);
                         ClientSocket.Connect("localhost", DEFAULT_AUB_PORT);
                         // uspesna konekcija na Host
                         ClientConnected = true;
@@ -251,12 +251,7 @@ namespace WpfDSCADA
 
                 if (ClientConnected)
                 {
-                    //IPEndPoint receivePoint;  // IP endpoint
-                                              // Create the EndPoint class
-                    //receivePoint = new IPEndPoint(IPAddress.Any, DEFAULT_AUB_PORT);
-                    //EndPoint tempReceivePoint = (EndPoint)receivePoint;
-                    //int length = ClientSocket.ReceiveFrom(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None, ref tempReceivePoint);
-
+                    
                     try
                     {
                         int rsts = ClientSocket.Receive(RxBuff, 0, MSG_MAX_LEN, SocketFlags.None);
@@ -273,6 +268,16 @@ namespace WpfDSCADA
                         {
                             string msg = Encoding.ASCII.GetString(RxBuff, 0, rsts);
                             Dispatcher.Invoke(DispatcherPriority.Normal, new DelegateProcessMsg(processMsg), msg);
+
+                            int msgSeqNumber = 0; //dodeliti iz rxbuff
+                            if (LastMessageReceived != 0)
+                            {
+                                if (LastMessageReceived++ != msgSeqNumber)
+                                {
+                                    SendToHost("NACK:" + (LastMessageReceived++).ToString());
+                                }
+                            }
+                            LastMessageReceived = msgSeqNumber;
                         }
                     } catch (SocketException se)
                     {
