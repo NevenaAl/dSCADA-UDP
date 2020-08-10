@@ -22,6 +22,7 @@ void ProcessCmd();
 #define DEFAULT_CLIENT_PORT 9995
 #define CMSG_MAX_SLEN 1500			// Client Send Msg
 #define CMSG_MAX_RLEN 250			// Client Recv Msg
+#define MSG_MAX_LEN 14996
 #define MAX_CLIENT_NUMBER 10        // Max number of connected clients
 #define MC_IP_ADDRESS "238.255.255.255"  // Multicast group ip address
 #define MC_PORT 9995					// Multicast group port
@@ -38,8 +39,8 @@ typedef struct
 
 typedef struct
 {
-	char* message;
 	int sequence_num;
+	char message[MSG_MAX_LEN];
 } SEND_MESSAGE;
 
 
@@ -244,7 +245,7 @@ int WaitForMessage(void)
 
 void ResendMessage(char* seq_number) {
 	int seq = atoi(seq_number);
-	for (int i = messageQueue->front;i < messageQueue->front + messageQueue->size;i++) {
+	for (int i = messageQueue->front;i < messageQueue->rear;i++) {
 		MESSAGE item = messageQueue->array[i];
 		if (item.sequence_num == seq) {
 			SendToPipe(item.message);
@@ -261,11 +262,17 @@ int SendToPipe(char* msg) {
 	{
 	    struct MESSAGE message;
 		memcpy(message.message, msg, strlen(msg) + 1);
-//		message.message = msg;
 		message.sending_time = time(0);
 		message.sequence_num = NoSentMessages+1;
 
+		//putting a message in a servers queue for 30 seconds
 		Enqueue(messageQueue, message);
+
+		//making a message structure to put sequence number and message
+		SEND_MESSAGE* messageStruct = (SEND_MESSAGE*)(malloc(sizeof(SEND_MESSAGE)));
+
+		memcpy(messageStruct->message, msg, strlen(msg) + 1);
+		messageStruct->sequence_num = NoSentMessages + 1;
 
 		int  msg_len;
 		msg_len = strlen(msg);
@@ -289,7 +296,7 @@ int SendToPipe(char* msg) {
 		mc_addr.sin_port = htons((u_short)mc_port);
 		int tolen = sizeof(mc_addr);
 
-		if ((sendto(socklsn, msg, msg_len, 0, (const struct sockaddr*) & mc_addr, tolen)) != msg_len) {
+		if ((sendto(socklsn, (char*)messageStruct, msg_len +4, 0, (const struct sockaddr*) & mc_addr, tolen)) != msg_len+4) {
 			perror("sendto() sent incorrect number of bytes");
 			DisconnectClient();
 			return NOK;

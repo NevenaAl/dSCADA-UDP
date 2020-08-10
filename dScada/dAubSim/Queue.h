@@ -2,11 +2,12 @@
 #pragma once
 #include "winsock2.h"
 #include <stdio.h>
+#define MSG_MAX_LEN 14996
 
 struct MESSAGE
 {
 	time_t sending_time;
-	char message[250];
+	char message[MSG_MAX_LEN];
 	int sequence_num;
 } ;
 

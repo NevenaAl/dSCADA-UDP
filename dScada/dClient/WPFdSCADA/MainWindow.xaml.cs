@@ -266,15 +266,22 @@ namespace WpfDSCADA
                         }
                         else
                         {
-                            string msg = Encoding.ASCII.GetString(RxBuff, 0, rsts);
+                            string msg = Encoding.ASCII.GetString(RxBuff, 4, rsts-4);
                             Dispatcher.Invoke(DispatcherPriority.Normal, new DelegateProcessMsg(processMsg), msg);
 
-                            int msgSeqNumber = 0; //dodeliti iz rxbuff
+                            int msgSeqNumber = 0; 
+                            byte[] tempBuff = new byte[4];
+                            tempBuff[0] = RxBuff[0];
+                            tempBuff[1] = RxBuff[1];
+                            tempBuff[2] = RxBuff[2];
+                            tempBuff[3] = RxBuff[3];
+                            msgSeqNumber = BitConverter.ToInt32(tempBuff,0);
                             if (LastMessageReceived != 0)
                             {
-                                if (LastMessageReceived++ != msgSeqNumber)
+                                int NextMessageToReceive = LastMessageReceived + 1;
+                                if (NextMessageToReceive != msgSeqNumber)
                                 {
-                                    SendToHost("NACK:" + (LastMessageReceived++).ToString());
+                                    SendToHost("NACK:" + NextMessageToReceive.ToString());
                                 }
                             }
                             LastMessageReceived = msgSeqNumber;
